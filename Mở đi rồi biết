@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SYSTEM FAILURE</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; }
+        #bsod {
+            display: block;
+            background: #0078D7;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 50px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        h1 { font-size: 32px; margin: 30px 0; }
+        p { font-size: 20px; margin: 15px 0; line-height: 1.6; }
+        #error { color: #E3170D; font-weight: bold; }
+        #lock {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: black; color: red;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 150px 20px;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        input {
+            padding: 15px;
+            font-size: 24px;
+            margin: 20px;
+            width: 300px;
+            text-align: center;
+            border: 2px solid red;
+            background: #111;
+            color: lime;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #333;
+            color: orange;
+            border: none;
+            cursor: pointer;
+        }
+        .blink {
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- FAKE BSOD PHASE 1 -->
+<div id="bsod">
+    <h1>:( MÁY TÍNH CỦA BẠN ĐÃ BỊ KHÓA</h1>
+    <p>Chúng tôi đang thu thập dữ liệu lỗi...</p>
+    <p>Không khởi động lại hoặc tắt nguồn.</p>
+    <p id="error">LỖI: TROLL-ENGINE.EXE STOPPED</p>
+    <p>0x0000000000000069 — Không thể truy cập hệ thống</p>
+    <p>Đang chuẩn bị chế độ khôi phục...</p>
+</div>
+
+<!-- LOCK SCREEN PHASE 2 -->
+<div id="lock">
+    <h1 style="color: #ff0000;">⚠️ THIẾT BỊ BỊ KHÓA ⚠️</h1>
+    <p class="blink">[CRITICAL] Hệ thống bị xâm nhập bởi <b>HAIBEODUDE</b></p>
+    <p>Không thể truy cập dữ liệu cá nhân</p>
+    <p>Không thể thoát hoặc đóng tab</p>
+    <p>----------</p>
+    <p><b>Nhập KEY để mở khóa (5 giây nữa hiện)</b></p>
+    <div id="keybox" style="display:none;">
+        <input type="text" id="key" placeholder="Nhập key...">
+        <br>
+        <button onclick="unlock()">MỞ KHÓA</button>
+        <p id="msg" style="color: yellow; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+// Kích hoạt fullscreen sau 2s
+setTimeout(() => {
+    document.documentElement.requestFullscreen().catch(() => {
+        // Nếu không được, vẫn tiếp tục
+    });
+}, 2000);
+
+// Chặn các phím nguy hiểm
+document.addEventListener("keydown", function(e) {
+    // F12, Ctrl+Shift+I, Ctrl+U, F5, Esc
+    if (e.key === "F12" || 
+        (e.ctrlKey && e.shiftKey && e.key === "I") ||
+        (e.ctrlKey && e.key === "u") ||
+        e.key === "F5" ||
+        e.key === "Escape") {
+        e.preventDefault();
+        alert("Chức năng bị vô hiệu hóa!");
+    }
+});
+
+// Chặn chuột phải
+document.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    alert("Click phải bị cấm!");
+});
+
+// Chuyển sang màn hình khóa sau 5s
+setTimeout(() => {
+    document.getElementById("bsod").style.display = "none";
+    document.getElementById("lock").style.display = "block";
+    setTimeout(() => {
+        document.getElementById("keybox").style.display = "block";
+    }, 1000);
+}, 5000);
+
+// Mở khóa
+function unlock() {
+    const key = document.getElementById("key").value;
+    const msg = document.getElementById("msg");
+
+    if (key === "Haibeo") {
+        msg.textContent = "Đang giải mã...";
+        msg.style.color = "lime";
+        
+        setTimeout(() => {
+            document.getElementById("lock").innerHTML = `
+                <h1 style="color:lime;">🔓 MỞ KHÓA THÀNH CÔNG!</h1>
+                <p>Chúc mừng bạn vừa bị troll bằng HTML cơ bản 😈</p>
+                <h2>HAHAHAHAHAHA!!!</h2>
+                <audio autoplay src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+                <iframe width="0" height="0" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0"></iframe>
+            `;
+            setTimeout(() => {
+                alert("Đùa thôi, địt cụ mày! 🤡");
+            }, 3000);
+        }, 2000);
+    } else {
+        msg.textContent = "SAI KEY! Thiết bị sẽ tự hủy trong 10s...";
+        msg.style.color = "red";
+        // Tăng ức chế
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => alert("⚠️ BOMB ARMED: 10s ⏳"), i * 2000);
+        }
+    }
+}
+
+// Chặn backspace (tránh quay lại trang trước)
+window.addEventListener("keydown", function(e) {
+    if (e.keyCode === 8 && !/input|textarea/i.test(e.target.nodeName)) {
+        e.preventDefault();
+    }
+});
+</script>
+
+</body>
+</html>
