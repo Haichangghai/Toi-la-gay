@@ -1227,7 +1227,7 @@
       p_banminh: 'bạn|mình',
       p_toi: 'tôi',
       p_ongba: 'ông|bà|tui|bả|ổng',
-      p_fam: 'con|bố|mẹ|ba|má|bố mẹ|ba mẹ',
+      p_fam: 'con:0.25|bố|mẹ|ba:0.3|má:0.6|bố mẹ|ba mẹ|con ăn|con về|mẹ ơi|bố ơi',
       p_formal: 'ạ|dạ|vâng|thưa',
       p_chiem: 'chị',
     };
@@ -1375,14 +1375,16 @@
     function derive(acc, them) {
       if (!acc || !acc.n) return null;
       them = them || 'Họ';
-      const n0 = acc.n[0], n1 = acc.n[1], N = Math.max(1, n0 + n1);
+      const tx = s => Math.max(0, acc.n[s] - acc.med[s] - acc.sh[s]) || acc.n[s];
+      const n0 = tx(0), n1 = tx(1), N = Math.max(1, n0 + n1), NS = [Math.max(1, n0), Math.max(1, n1)];
       const F = id => acc.f['f_' + id] || acc.f[id] || [0, 0];
       const tot = id => { const f = F(id); return f[0] + f[1]; };
-      const per = (id, s) => { const f = F(id); return s === undefined ? (f[0] + f[1]) / N * 100 : f[s] / Math.max(1, acc.n[s]) * 100; };
+      const per = (id, s) => { const f = F(id); return s === undefined ? (f[0] + f[1]) / N * 100 : f[s] / NS[s] * 100; };
       const both = id => Math.min(per(id, 0), per(id, 1));
       // chủ đề
-      const tsum = TOPICS.reduce((a, t) => a + tot(t[0]), 0);
-      const topics = TOPICS.map(t => { const f = F(t[0]); return { id: t[0], icon: t[1], name: t[2], me: f[0], them: f[1], n: f[0] + f[1], pct: tsum ? (f[0] + f[1]) / tsum : 0 }; })
+      const FT = id => acc.f[id] || [0, 0]; // số đếm của CHỦ ĐỀ (khác tín hiệu f_… cùng tên)
+      const tsum = TOPICS.reduce((a, t) => a + FT(t[0])[0] + FT(t[0])[1], 0);
+      const topics = TOPICS.map(t => { const f = FT(t[0]); return { id: t[0], icon: t[1], name: t[2], me: f[0], them: f[1], n: f[0] + f[1], pct: tsum ? (f[0] + f[1]) / tsum : 0 }; })
         .filter(t => t.n >= 1).sort((a, b) => b.n - a.n);
       const share = id => { const t = topics.find(x => x.id === id); return t ? t.pct : 0; };
       // từ khoá: ưu tiên cụm 2 từ, bỏ từ đơn đã nằm trong cụm
@@ -1405,7 +1407,7 @@
       const dry0 = acc.dry[0] / Math.max(1, n0), dry1 = acc.dry[1] / Math.max(1, n1);
       const len0 = acc.ch[0] / Math.max(1, n0), len1 = acc.ch[1] / Math.max(1, n1);
       const inv = share0 >= 0.5 ? 0 : 1, oth = 1 - inv;
-      const imb = Math.max(0, Math.abs(share0 - 0.5) - 0.08) / 0.42;
+      const imb = (Math.max(0, Math.abs(share0 - 0.5) - 0.08) / 0.42) * sat(N, 80);
       const dryGap = Math.max(0, (inv ? dry0 : dry1) - (inv ? dry1 : dry0));
       const lenR = Math.max(1, inv ? len1 : len0) / Math.max(1, inv ? len0 : len1);
       const warm = s => per('love', s) + per('care', s) + per('flirt', s) * 0.6;
@@ -1420,7 +1422,7 @@
           - 1.0 * imb - 1.4 * sat(dryGap, 0.25) - 1.0 * oneSided,
         crush: 1.1 * sat(both('flirt'), 1.5) + 0.5 * sat(per('flirt'), 3) + 0.8 * sat(both('care'), 3) + 0.6 * sat(per('p_anhem') + per('p_cauto'), 8) + 0.5 * sat(per('love'), 1.5) + 0.5 * sat(night, 0.25) + 0.5 * bal
           - 1.5 * sat(both('pet'), 0.8) - 0.9 * sat(informal, 4) - 1.2 * sat(fam, 6) - 1.2 * imb - 1.4 * sat(dryGap, 0.25) - 0.8 * oneSided,
-        lop: 2.4 * imb + 1.6 * sat(dryGap, 0.2) + 0.5 * sat(Math.log2(lenR), 1) + 1.4 * oneSided - 0.6,
+        lop: 1.8 * imb + 1.6 * sat(dryGap, 0.2) + 0.5 * sat(Math.log2(lenR), 1) + 1.4 * oneSided - 0.9,
         bestie: 1.5 * sat(informal, 3) + 1.0 * sat(per('swear'), 2) + 0.8 * sat(lau, 10) + 0.5 * sat(share('game') + share('fun'), 0.3) + 0.4 * bal + 0.3 * sat(N, 1500)
           - 1.4 * sat(both('pet'), 0.8) - 0.6 * sat(both('love'), 1.5) - 0.6 * imb,
         friend: 0.9 + 0.5 * sat(per('p_cauto') + per('p_banminh'), 5) + 0.4 * sat(lau, 6) + 0.4 * sat(share('study') + share('ent') + share('game') + share('food'), 0.4) + 0.3 * bal
