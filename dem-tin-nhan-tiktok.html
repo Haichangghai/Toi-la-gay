@@ -285,6 +285,13 @@ h1{font:700 clamp(46px,5.8vw,78px)/.98 var(--sans);letter-spacing:-.045em}
 .first cite{display:block;margin-top:8px;font-style:normal;font-size:14px;color:var(--mute)}
 .rbg{margin-right:7px}
 @media (max-width:560px){.gg{grid-template-columns:repeat(2,1fr);row-gap:18px}.cp{grid-template-columns:1fr}.rp{grid-template-columns:1fr;gap:6px}.dtabs button{padding:0 13px;font-size:14px}}
+.gp{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line)}
+.gpn b{display:block;font-weight:700}
+.gpn small{font-size:13px;color:var(--mute)}
+.gseg{display:flex;gap:4px;padding:4px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.gseg button{height:34px;padding:0 13px;border-radius:999px;font-weight:700;font-size:13.5px;color:var(--mute)}
+.gseg button[aria-pressed=true]{background:rgba(238,237,255,.12);color:var(--ink)}
+.gseg button.set{background:var(--cy);color:#06051C}
 
 /* ---------- PHẦN 2: hướng dẫn ---------- */
 .wrap2{display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);column-gap:clamp(36px,6vw,88px);align-items:start;padding:clamp(32px,6vh,64px) 0 96px}
@@ -905,7 +912,8 @@ const AN = (() => {
   const FEATS = {
     pet: 'bé ơi|bé yêu|em bé:0.5|baby|bae|honey|cưng|cục cưng|bảo bối|người yêu:0.5|vợ|chồng|vợ ơi|chồng ơi|vợ yêu|chồng yêu|ông xã|bà xã|anh yêu|em yêu|mình ơi|cục vàng|công chúa|hoàng tử|bé:0.4|vk|ck:0.3|yêu ơi|anh yêu ơi|darling|béo ơi',
     love: 'yêu|thương|love|love you|ily|yêu em|yêu anh|thương em|thương anh|yêu cậu|nhớ em|nhớ anh|nhớ cậu|nhớ tớ|nhớ bé|nhớ quá|nhớ ghê|hôn|moah|chụt|muah|ôm|kiss|hun|thơm má|yêu nhiều|thương nhiều',
-    flirt: 'thích:0.6|crush|nhớ:0.4|ghen|dễ thương|đáng yêu|cute|xinh|xinh quá|đẹp trai|thính|tán|đổ|cưa|nắm tay|hẹn hò|rảnh không|có nhớ|nhớ không|nghĩ về|mơ thấy|ngại|làm người yêu|quen nhau|tỏ tình|xinh xắn|dễ thương ghê|đi chơi không|đi xem phim không',
+    flirt: 'thích cậu|thích em|thích anh|thích bạn|thích tớ|thích mày|thích ai|có thích ai|tớ thích|crush|nhớ cậu|nhớ em|nhớ anh|nhớ bạn|nhớ tớ|nhớ mày|nhớ ghê|nhớ quá|có nhớ|nhớ không|làm người yêu|làm ny|làm bạn gái|làm bạn trai|có người yêu chưa|có ny chưa|có bồ chưa|có ai chưa|người yêu chưa|sao chưa có người yêu|còn ế|ế à|ế:0.4|làm quen|thả thính|thính|đổ rồi|đổ cậu|đổ em|đổ anh|cưa:0.5|tán:0.4|ghen à|ghen hả|ghen:0.6|dễ thương ghê|dễ thương quá|dễ thương thế|cute quá|cute ghê|xinh quá|xinh ghê|xinh thế|đẹp trai quá|đẹp trai ghê|đẹp trai thế|đẹp quá:0.5|mơ thấy|nghĩ về cậu|nghĩ về em|nghĩ về anh|muốn gặp|muốn ôm|nắm tay|đi chơi riêng|hai đứa mình|chỉ hai đứa|người ấy:0.6|tim tớ|tim em|tim anh|trái tim:0.6|đánh cắp|cướp mất|yêu xa|ngại quá:0.5|ngại:0.3|hẹn hò:0.6|đi chơi không:0.4|rảnh không:0.3',
+    ack: 'người yêu của|ny của|người yêu anh|người yêu em|người yêu tớ|ny anh|ny em|ny tớ|bạn trai:0.4|bạn gái:0.4|vợ|chồng|vợ ơi|chồng ơi|vợ yêu|chồng yêu|vk|ck:0.3|ông xã|bà xã|yêu nhau|kỷ niệm:0.5|ngày yêu|tháng yêu|năm yêu|chia tay:0.6|làm hòa:0.6|anh yêu em|em yêu anh|yêu anh|yêu em|yêu cậu|yêu tớ|love you|ily|cục cưng|bảo bối|honey|bé yêu|anh yêu|em yêu|moah|chụt|muah|hôn:0.6|thơm má|nhớ vợ|nhớ chồng|cưới:0.3',
     care: TOPICS[2][3],
     sorry: 'xin lỗi|sorry|sr|lỗi tại',
     thanks: 'cảm ơn|cám ơn|thank|thank you',
@@ -921,6 +929,37 @@ const AN = (() => {
     p_chiem: 'chị',
   };
   const SWEAR = new Set(FEATS.swear.split('|'));
+  const GP = { anh: 'm', chị: 'f', ông: 'm', bà: 'f', bố: 'm', ba: 'm', mẹ: 'f', má: 'f', chú: 'm', cô: 'f', dì: 'f', thằng: 'm' };
+  const GW = { ông: 0.5, bà: 0.5, cô: 0.4, chú: 0.6, ba: 0.6, thằng: 0.5 };
+  const THIRD = new Set(['ấy', 'kia', 'đó', 'trai', 'gái', 'họ', 'nó', 'tao', 'tôi', 'mình', 'tớ', 'nội', 'ngoại', 'bạn', 'hàng', 'giáo']);
+  const VERB = new Set(['nhớ', 'yêu', 'thương', 'với', 'cho', 'của', 'gặp', 'đón', 'chờ', 'đợi', 'thích', 'giận', 'hỏi', 'gọi', 'nói', 'kể', 'rủ', 'chở', 'đưa', 'giúp', 'ơn', 'xin', 'mời', 'bảo', 'nhờ']);
+  const GADDR = { 'đẹp trai': ['m', 1], 'xinh gái': ['f', 1], 'xinh đẹp': ['f', 0.8], xinh: ['f', 0.6], 'công chúa': ['f', 1], 'hoàng tử': ['m', 1], vợ: ['f', 1.2], vk: ['f', 1.2], 'bà xã': ['f', 1.2], chồng: ['m', 1.2], ck: ['m', 0.5], 'ông xã': ['m', 1.2], bro: ['m', 0.8], nàng: ['f', 0.5], chàng: ['m', 0.5], 'anh zai': ['m', 1], sis: ['f', 0.8] };
+  const FLIRT_EMO = /😳|🙈|😘|🥰|😍|😚|🫶|😽|💕|💗|💞|💘|💖/u;
+  // giới tính từ username: tách tên tiếng Việt không dấu (kienvan1172 → kiên + văn → nam)
+  const NAME_M = 'tuan hung cuong thang kien duc hieu huy hoang khoa khang long nam phong phuc quang quan son tai thinh trung tung vinh viet bao dat duy hai hau hoai kiet loc luan nhat nghia phat quoc sang thai thien thuan toan tri truong tuong cong manh dai khai khoi binh chien danh hao huu lap luong nhan ninh phu quy thong trong vuong bach khiem tuyen tan tinh hoan hiep dong dung trieu boy king zai dzai';
+  const NAME_F = 'linh trang huong ngoc nhi thao mai lan hang hanh huyen lien nga ngan nhung oanh phuong quynh thu thuy trinh uyen yen dieu giao hue kieu loan nguyet nhien tram tuyet diep duyen hong khue thoa thom thuong bich cuc kim mien sen tham xinh girl gai princess queen vy my ly ha chi vi';
+  const NAME_U = 'anh minh thanh khanh tien giang hoa hien tam xuan chau an nguyen tran le pham huynh phan vu vo dang bui do ho ngo duong dinh ne nek real official';
+  const GN = new Map();
+  for (const w of NAME_M.split(' ')) GN.set(w, ['m', 1]);
+  for (const w of NAME_F.split(' ')) GN.set(w, ['f', 1]);
+  for (const w of NAME_U.split(' ')) GN.set(w, ['u', 0]);
+  GN.set('van', ['m', 1.5]); GN.set('thi', ['f', 1.5]);
+  function gname(name) {
+    const r = { m: 0, f: 0 };
+    const low = String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
+    for (const part of low.split(/[^a-z]+/)) {
+      const w = part.replace(/(.)\1{2,}/g, '$1');
+      for (let i = 0; i < w.length;) {
+        let hit = '';
+        for (let L = Math.min(8, w.length - i); L >= 2; L--) { const sub = w.substr(i, L); if (GN.has(sub) && (L >= 3 || i + L === w.length)) { hit = sub; break; } }
+        if (!hit) { i++; continue; }
+        const [g, k] = GN.get(hit);
+        if (g === 'm') r.m += k; else if (g === 'f') r.f += k;
+        i += hit.length;
+      }
+    }
+    return r;
+  }
   const LEX = new Map();
   let MAXN = 1;
   const addLex = (id, list) => {
@@ -951,7 +990,7 @@ const AN = (() => {
 
   function newAcc() {
     return { v: 1, n: [0, 0], ch: [0, 0], q: [0, 0], emo: [0, 0], med: [0, 0], sh: [0, 0], dry: [0, 0], lau: [0, 0], st: [0, 0], mr: [0, 0], rn: [0, 0], ng: [0, 0], ml: [0, 0],
-      f: {}, w: {}, e: {}, hr: new Array(24).fill(0), dw: new Array(7).fill(0), dy: {}, ad: 0, bd: 0, bn: 0, t0: 0, t1: 0, ts: 0, run: 0, rs: -1, lt: 0, rt: [0, 0], rc: [0, 0], rb: [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]] };
+      f: {}, w: {}, e: {}, hr: new Array(24).fill(0), dw: new Array(7).fill(0), dy: {}, ad: 0, bd: 0, bn: 0, t0: 0, t1: 0, ts: 0, run: 0, rs: -1, lt: 0, fl: [0, 0], fe: [0, 0], flt: [0, 0], fr: 0, fi: 0, pf: null, g: { s: [[0, 0], [0, 0]], o: [[0, 0], [0, 0]] }, rt: [0, 0], rc: [0, 0], rb: [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]] };
   }
   const bump = (o, k, s, by = 1) => { const a = o[k] || (o[k] = [0, 0]); a[s] += by; };
   function add(acc, m) {
@@ -994,10 +1033,35 @@ const AN = (() => {
     for (let n = 1; n <= MAXN; n++) {
       for (let i = 0; i + n <= T.length; i++) {
         const L = LEX.get(n === 1 ? T[i] : T.slice(i, i + n).join(' '));
-        if (L) for (const [id, w] of L) hit[id] = Math.min(2, (hit[id] || 0) + w);
+        if (L && !(T[i + n - 1] === 'anh' && T[i + n] === 'em')) for (const [id, w] of L) hit[id] = Math.min(2, (hit[id] || 0) + w); // "anh em" = bạn bè
       }
     }
     for (const id in hit) bump(acc.f, id, s, hit[id]);
+    // giới tính qua xưng hô: tự xưng (câu kể bắt đầu bằng "anh…") hay gọi người kia ("anh ơi", "nhớ anh", câu hỏi "anh ăn chưa")
+    const isQ = /\?\s*$/.test(text) || Q_END.has(T[T.length - 1]);
+    const G = acc.g, gv = (who, g, w) => { const a = who === 'self' ? G.s[s] : G.o[s]; a[g === 'm' ? 0 : 1] += w; };
+    for (let i = 0; i < T.length; i++) {
+      const g = GP[T[i]]; if (!g) continue;
+      const w = GW[T[i]] || 1, nx = T[i + 1];
+      if ((nx && THIRD.has(nx)) || (T[i] === 'anh' && nx === 'em') || (T[i] === 'em' && T[i - 1] === 'anh')) continue;
+      if (nx === 'ơi') gv('other', g, w * 1.5);
+      else if (i === 0 && T.length >= 2 && T[i] !== 'thằng') gv(isQ ? 'other' : 'self', g, w);
+      else if (i > 0 && VERB.has(T[i - 1])) gv('other', g, w);
+    }
+    for (let n = 1; n <= 2; n++) for (let i = 0; i + n <= T.length; i++) { const x = GADDR[n === 1 ? T[i] : T[i] + ' ' + T[i + 1]]; if (x) gv('other', x[0], x[1]); }
+    // thả thính rõ ràng & phản ứng của bên kia (thả lại hay lờ đi)
+    const fl = (hit.f_flirt || 0) + (FLIRT_EMO.test(text) ? 0.5 : 0), warmMsg = fl + (hit.f_love || 0) + (hit.f_ack || 0);
+    if (acc.pf) {
+      const dt = m.t && acc.pf.t ? m.t - acc.pf.t : 0;
+      if (acc.pf.s !== s) { if (dt <= 6 * 3600e3 && warmMsg >= 0.5) acc.fr++; else acc.fi++; acc.pf = null; }
+      else if (dt > 6 * 3600e3) { acc.fi++; acc.pf = null; }
+    }
+    if (fl >= 1) {
+      acc.fl[s]++;
+      if (!acc.flt[s] || (m.t && m.t - acc.flt[s] >= 24 * 3600e3)) acc.fe[s]++;
+      if (m.t) acc.flt[s] = m.t;
+      if (!acc.pf) acc.pf = { s, t: m.t };
+    }
     // từ hay dùng (bỏ từ đệm, từ tục)
     let prev = null;
     for (const t of T) {
@@ -1037,11 +1101,13 @@ const AN = (() => {
   function merge(a, b) {
     if (!a) return b; if (!b) return a;
     const r = newAcc();
-    for (const k of ['n', 'ch', 'q', 'emo', 'med', 'sh', 'dry', 'lau', 'st', 'rn', 'ng', 'rt', 'rc']) r[k] = [a[k][0] + b[k][0], a[k][1] + b[k][1]];
+    for (const k of ['n', 'ch', 'q', 'emo', 'med', 'sh', 'dry', 'lau', 'st', 'rn', 'ng', 'rt', 'rc', 'fl', 'fe']) r[k] = [a[k][0] + b[k][0], a[k][1] + b[k][1]];
     for (const k of ['mr', 'ml']) r[k] = [Math.max(a[k][0], b[k][0]), Math.max(a[k][1], b[k][1])];
     for (const k of ['f', 'w', 'e']) { r[k] = JSON.parse(JSON.stringify(a[k] || {})); for (const x in b[k] || {}) { const t = r[k][x] || (r[k][x] = [0, 0]); t[0] += b[k][x][0]; t[1] += b[k][x][1]; } }
     r.hr = a.hr.map((x, i) => x + b.hr[i]); r.dw = a.dw.map((x, i) => x + b.dw[i]);
     r.ts = a.ts + b.ts; r.t0 = Math.min(a.t0 || Infinity, b.t0 || Infinity); if (r.t0 === Infinity) r.t0 = 0; r.t1 = Math.max(a.t1, b.t1);
+    r.fr = a.fr + b.fr; r.fi = a.fi + b.fi;
+    r.g = { s: [0, 1].map(i => [a.g.s[i][0] + b.g.s[i][0], a.g.s[i][1] + b.g.s[i][1]]), o: [0, 1].map(i => [a.g.o[i][0] + b.g.o[i][0], a.g.o[i][1] + b.g.o[i][1]]) };
     r.rb = [0, 1].map(s => a.rb[s].map((x, i) => x + b.rb[s][i]));
     r.dy = { ...a.dy }; for (const k in b.dy) r.dy[k] = (r.dy[k] || 0) + b.dy[k];
     dayStats(r);
@@ -1052,7 +1118,7 @@ const AN = (() => {
   const sat = (x, k) => 1 - Math.exp(-Math.max(0, x) / k);
   const REL = {
     lover: ['💑', 'Người yêu', 'Gọi nhau ngọt xớt, nhớ nhung, chúc ngủ ngon đều đặn — đích thị một cặp!', ['#FE2C55', '#ff8fab']],
-    crush: ['🌫️', 'Mập mờ', 'Quan tâm hơn mức bạn bè, thả thính qua lại nhưng chưa ai chịu nói ra.', ['#8B5CF6', '#f472b6']],
+    crush: ['🌫️', 'Mập mờ', 'Lâu lâu lại thả một câu thính, bên kia vờ như không thấy rồi lâu lâu thả lại — nhưng chưa ai công nhận là người yêu.', ['#8B5CF6', '#f472b6']],
     lop: ['🛞', 'Lốp dự phòng', '', ['#FFC53D', '#ff8a3d']],
     bestie: ['🤜🤛', 'Bạn thân chí cốt', 'Mày–tao, cà khịa, cười như điên — tình bạn bền vững.', ['#25F4EE', '#0ea5e9']],
     friend: ['👫', 'Bạn bè', 'Nói chuyện vui vẻ, thoải mái, đúng chuẩn bạn bè.', ['#34d399', '#25F4EE']],
@@ -1067,7 +1133,8 @@ const AN = (() => {
       ? { emoji: '🛞', label: 'Bạn đang làm lốp', desc: 'Bạn nhắn nhiều, hỏi han đủ điều, còn họ trả lời nhạt nhẽo. Cân nhắc nha 😅', grad: m[3] }
       : { emoji: '🛞', label: 'Họ đang làm lốp', desc: 'Họ nhắn nhiều và quan tâm bạn hơn hẳn, còn bạn trả lời khá hờ hững.', grad: m[3] };
   };
-  function derive(acc, them) {
+  function derive(acc, them, opt) {
+    opt = opt || {};
     if (!acc || !acc.n) return null;
     them = them || 'Họ';
     const tx = s => Math.max(0, acc.n[s] - acc.med[s] - acc.sh[s]) || acc.n[s];
@@ -1116,13 +1183,18 @@ const AN = (() => {
     const lau = (acc.lau[0] + acc.lau[1]) / N * 100;
     const informal = per('p_taomay') + per('p_ongba') * 0.6;
     const fam = per('p_fam') + per('p_formal') * 0.5;
+    // giới tính (đoán từ tên + xưng hô, hoặc bạn tự chọn): cùng giới → khó là người yêu / mập mờ
+    const same = clamp(opt.same || 0, 0, 1);
+    // "công nhận" là một cặp: gọi vợ/chồng, nói yêu nhau, người yêu của… — tính cả hai bên
+    const ackS = 0.6 * sat(Math.min(per('ack', 0), per('ack', 1)), 0.5) + 0.4 * sat(per('ack'), 1.5);
+    const flT = acc.fl[0] + acc.fl[1], ignore = acc.fi / Math.max(1, acc.fi + acc.fr);
     const S = {
-      lover: 2.4 * sat(both('pet'), 0.8) + 1.6 * sat(both('love'), 1.2) + 0.9 * sat(both('care'), 3) + 0.6 * sat(night, 0.25) + 0.4 * bal - 1.0 * sat(informal, 4) - 1.4 * sat(fam, 6)
-        - 1.0 * imb - 1.4 * sat(dryGap, 0.25) - 1.0 * oneSided + 0.3 * bothFast,
-      crush: 1.1 * sat(both('flirt'), 1.5) + 0.5 * sat(per('flirt'), 3) + 0.8 * sat(both('care'), 3) + 0.6 * sat(per('p_anhem') + per('p_cauto'), 8) + 0.5 * sat(per('love'), 1.5) + 0.5 * sat(night, 0.25) + 0.5 * bal
-        - 1.5 * sat(both('pet'), 0.8) - 0.9 * sat(informal, 4) - 1.2 * sat(fam, 6) - 1.2 * imb - 1.4 * sat(dryGap, 0.25) - 0.8 * oneSided + 0.2 * bothFast,
-      lop: 1.8 * imb + 1.6 * sat(dryGap, 0.2) + 0.5 * sat(Math.log2(lenR), 1) + 1.4 * oneSided + 0.6 * slowOth - 0.9,
-      bestie: 1.5 * sat(informal, 3) + 1.0 * sat(per('swear'), 2) + 0.8 * sat(lau, 10) + 0.5 * sat(share('game') + share('fun'), 0.3) + 0.4 * bal + 0.3 * sat(N, 1500)
+      lover: 2.2 * ackS + 1.2 * sat(both('love'), 1.2) + 0.6 * sat(both('pet'), 0.8) + 0.6 * sat(both('care'), 3) + 0.4 * sat(night, 0.25) + 0.3 * bothFast
+        - 1.0 * sat(informal, 4) - 1.4 * sat(fam, 6) - 1.0 * imb - 1.4 * sat(dryGap, 0.25) - 1.0 * oneSided - 2.4 * same,
+      crush: (flT < 2 ? -2 : 0) + 1.5 * sat(flT, 4) + 1.1 * sat(Math.min(acc.fe[0], acc.fe[1]), 1.5) + 0.7 * sat(acc.fe[0] + acc.fe[1], 4) + 0.7 * ignore * sat(flT, 3)
+        + 0.3 * sat(night, 0.25) - 2.4 * ackS - 1.0 * imb - 1.0 * sat(dryGap, 0.3) - 1.2 * sat(fam, 6) - 0.6 * sat(informal, 5) - 1.8 * same,
+      lop: 1.8 * imb + 1.6 * sat(dryGap, 0.2) + 0.5 * sat(Math.log2(lenR), 1) + 1.4 * oneSided + 0.6 * slowOth - 0.9 - 1.2 * same,
+      bestie: 0.5 * same + 1.5 * sat(informal, 3) + 1.0 * sat(per('swear'), 2) + 0.8 * sat(lau, 10) + 0.5 * sat(share('game') + share('fun'), 0.3) + 0.4 * bal + 0.3 * sat(N, 1500)
         - 1.4 * sat(both('pet'), 0.8) - 0.6 * sat(both('love'), 1.5) - 0.6 * imb,
       friend: 0.9 + 0.5 * sat(per('p_cauto') + per('p_banminh'), 5) + 0.4 * sat(lau, 6) + 0.4 * sat(share('study') + share('ent') + share('game') + share('food'), 0.4) + 0.3 * bal
         - 1.0 * sat(both('love'), 1.2) - 0.8 * sat(both('pet'), 0.8) - 0.5 * sat(per('flirt'), 3) - 0.5 * imb,
@@ -1138,13 +1210,17 @@ const AN = (() => {
     const R = [];
     const add2 = (txt, tags, w) => R.push({ txt, tags, w });
     const fmt1 = x => fmt(Math.round(x));
-    if (tot('pet') >= 2) add2(`Gọi nhau “vợ/chồng/bé/baby…” ${fmt1(tot('pet'))} lần`, ['lover', 'crush'], 9);
+    if (tot('pet') >= 2) add2(`Gọi nhau “bé/baby/cưng…” ${fmt1(tot('pet'))} lần`, ['lover'], 7);
     if (tot('love') >= 2) add2(`Nói yêu / thương / nhớ ${fmt1(tot('love'))} lần (bạn ${fmt1(F('love')[0])} · ${them} ${fmt1(F('love')[1])})`, ['lover', 'crush', 'lop'], 8);
     if (tot('care') >= 3) add2(`Hỏi han, chúc ngủ ngon ${fmt1(tot('care'))} lần`, ['lover', 'crush', 'lop', 'family'], 7);
-    if (tot('flirt') >= 3) add2(`Thả thính, khen nhau ${fmt1(tot('flirt'))} lần`, ['crush', 'lover', 'lop'], 6);
+    if (flT >= 1) add2(`${fmt(flT)} câu thả thính rõ ràng (bạn ${fmt(acc.fl[0])} · ${them} ${fmt(acc.fl[1])}), rải rác trong ${fmt(acc.fe[0] + acc.fe[1])} đợt`, ['crush', 'lover', 'lop'], 8);
+    if (acc.fi + acc.fr >= 2) add2(`Sau mỗi câu thả thính: ${Math.round(ignore * 100)}% lần bên kia lờ đi, ${100 - Math.round(ignore * 100)}% lần thả lại`, ['crush', 'lover', 'lop'], 7);
+    if (tot('ack') >= 2) add2(`Gọi nhau vợ/chồng, nói yêu nhau… ${fmt1(tot('ack'))} lần (bạn ${fmt1(F('ack')[0])} · ${them} ${fmt1(F('ack')[1])})`, ['lover'], 9);
+    else if (flT >= 2) add2('Chưa từng gọi nhau vợ/chồng hay nói “yêu nhau” — chưa công nhận là người yêu', ['crush'], 9);
+    if (same > 0.4) add2(`Máy đoán hai bạn cùng là ${opt.gMe >= 0.5 ? 'con trai' : 'con gái'} → ít khả năng là người yêu (sửa giới tính bên dưới nếu sai)`, ['bestie', 'friend', 'work', 'known', 'family'], 9);
     const prons = [['p_taomay', 'mày – tao'], ['p_cauto', 'cậu – tớ'], ['p_anhem', 'anh – em'], ['p_banminh', 'bạn – mình'], ['p_ongba', 'ông – bà – tui'], ['p_fam', 'bố mẹ – con'], ['p_toi', 'tôi – bạn'], ['p_chiem', 'chị – em']]
       .map(([id, l]) => [id, l, tot(id)]).sort((a, b) => b[2] - a[2]);
-    if (prons[0][2] >= 3) add2(`Xưng hô chủ yếu: ${prons[0][1]}`, ['bestie', 'friend', 'crush', 'lover', 'family', 'work'], 6);
+    if (prons[0][2] >= 3) add2(`Xưng hô chủ yếu: ${prons[0][1]}`, ['bestie', 'friend', 'family', 'work'], 5);
     const ratio = Math.max(n0, n1) / Math.max(1, Math.min(n0, n1));
     if (ratio >= 1.35) add2(`${inv === 0 ? 'Bạn' : them} nhắn gấp ${ratio.toLocaleString('vi-VN', { maximumFractionDigits: 1 })} lần ${inv === 0 ? them : 'bạn'}`, ['lop'], 9);
     else add2('Hai bên nhắn qua lại khá đều', ['lover', 'crush', 'bestie', 'friend'], 3);
@@ -1166,7 +1242,7 @@ const AN = (() => {
     const st0 = acc.st[0], st1 = acc.st[1];
     const gauges = {
       close: Math.round(100 * clamp(0.3 * sat(N, 900) + 0.2 * sat(lau, 8) + 0.2 * sat(informal + per('p_cauto') + per('pet') * 2, 4) + 0.2 * sat(per('care'), 4) + 0.1 * sat((acc.emo[0] + acc.emo[1]) / N * 100, 15), 0, 1)),
-      romance: Math.round(100 * clamp(0.35 * sat(both('pet'), 0.8) + 0.3 * sat(per('love'), 1.5) + 0.2 * sat(per('flirt'), 2.5) + 0.15 * sat(night, 0.25) - 0.3 * sat(fam, 6), 0, 1)),
+      romance: Math.round(100 * clamp(0.4 * ackS + 0.3 * sat(flT, 6) + 0.15 * sat(per('love'), 1.5) + 0.15 * sat(night, 0.25) - 0.3 * sat(fam, 6) - 0.5 * same, 0, 1)),
       balance: Math.round(100 * clamp(bal * (1 - Math.min(1, dryGap * 1.5)), 0, 1)),
       init: st0 + st1 >= 4 ? Math.round((st0 / (st0 + st1)) * 100) : Math.round(share0 * 100),
     };
@@ -1180,7 +1256,8 @@ const AN = (() => {
     };
     return { N, topics: topics.slice(0, 8), words, emojis, catch: [catchOf(0), catchOf(1)], rel: { ...best, conf: Math.min(0.96, best.p * (N < 60 ? 0.75 : 1)), probs, reasons, gauges, who: inv }, habits };
   }
-  return { build, merge, derive, relMeta, TOPICS, REL };
+  function gender(acc, s) { const G = acc.g || { s: [[0, 0], [0, 0]], o: [[0, 0], [0, 0]] }; return { m: G.s[s][0] + G.o[1 - s][0], f: G.s[s][1] + G.o[1 - s][1] }; }
+  return { build, merge, derive, relMeta, gender, gname, TOPICS, REL };
 })();
 
 
@@ -1788,13 +1865,37 @@ $('copy').onclick = async () => {
 const KMAP = { text: 'text', share: 'share', link: 'share', photo: 'media', gif: 'media' };
 const anMsgs = c => c.msgs.map(m => ({ me: m.from === 'Bạn', kind: KMAP[m.kind] || 'text', text: m.text, t: isFinite(m.t) ? m.t : 0, gap: false }));
 const themOf = c => (c.agg ? 'Mọi người' : c.kind === 'group' ? 'Cả nhóm' : short(c.name, 14));
+/* giới tính: đoán từ tên (username) + cách xưng hô; bạn có thể tự chọn lại, lưu trên máy */
+const GKEY = 'dtnGender';
+const gOver = (() => { try { return JSON.parse(localStorage.getItem(GKEY)) || {}; } catch { return {}; } })();
+const saveG = () => { try { localStorage.setItem(GKEY, JSON.stringify(gOver)); } catch {} };
+function autoG(m, f, nm) {
+  const n = AN.gname(nm), sc = (m - f) + 2.5 * (n.m - n.f), ev = m + f + 2.5 * (n.m + n.f);
+  return { p: ev < 0.8 ? 0.5 : 1 / (1 + Math.exp(-sc / 1.6)), ev, name: n.m + n.f > 0 };
+}
+const gFinal = (key, auto) => (gOver[key] === 'm' ? { p: 0.98, ev: 99, hand: true } : gOver[key] === 'f' ? { p: 0.02, ev: 99, hand: true } : auto || { p: 0.5, ev: 0 });
+function computeGenders() {
+  let m = 0, f = 0;
+  for (const c of ST.data) if (c.kind === 'dm' && c.an) { const g = AN.gender(c.an, 0); m += g.m; f += g.f; }
+  ST.gMe = autoG(m, f, ST.me);
+  for (const c of ST.data) if (c.kind === 'dm' && c.an) { const g = AN.gender(c.an, 1); c.gAuto = autoG(g.m, g.f, c.name); }
+}
+function deriveConv(c) {
+  if (c.kind !== 'dm') { c.D = AN.derive(c.an, themOf(c)); return; }
+  const a = gFinal('__me', ST.gMe), b = gFinal('n:' + c.name, c.gAuto);
+  const same = a.p * b.p + (1 - a.p) * (1 - b.p);
+  c.g = { me: a, them: b };
+  c.D = AN.derive(c.an, themOf(c), { same: Math.max(0, (same - 0.5) * 2), gMe: a.p, gThem: b.p });
+}
 async function analyzeAll() {
   const tok = ST.tok = (ST.tok || 0) + 1;
   ST.analyzed = false;
   for (const c of ST.data) {
     if (ST.tok !== tok) return;
-    if (!c.an) { c.an = await AN.build(anMsgs(c)); c.D = AN.derive(c.an, themOf(c)); }
+    if (!c.an) c.an = await AN.build(anMsgs(c));
   }
+  computeGenders();
+  for (const c of ST.data) deriveConv(c);
   if (ST.all) {
     let acc = null;
     for (const c of ST.data) if (c.kind === 'dm') acc = AN.merge(acc, c.an);
@@ -1855,6 +1956,16 @@ function renderPanels(c) {
   else if (c.kind === 'group') pr.innerHTML = groupHTML(c);
   else if (c.kind === 'ai') pr.innerHTML = `<div class="relc" style="--g1:#A593FF;--g2:#25F4EE"><div class="rele">🤖</div><div class="rell">ĐÂY LÀ</div><div class="reln">Trợ lý AI</div><p class="reld">${esc(c.name)} là chatbot của TikTok, nên không đoán mối quan hệ. Chủ đề và thói quen vẫn xem được.</p></div>`;
   else pr.innerHTML = !D ? wait : relHTML(c, D, them);
+  pr.querySelectorAll('.gseg button').forEach(b => {
+    b.onclick = () => {
+      const key = b.parentElement.dataset.k;
+      if (b.dataset.g) gOver[key] = b.dataset.g; else delete gOver[key];
+      saveG();
+      if (key === '__me') ST.data.forEach(deriveConv); else deriveConv(c);
+      if (ST.all && ST.all.an) ST.all.D = AN.derive(ST.all.an, 'Mọi người');
+      renderList(); renderPanels(c);
+    };
+  });
   /* ---- Thói quen ---- */
   $('pHb').innerHTML = !D ? wait : hbHTML(c, D, them);
 }
@@ -1899,10 +2010,17 @@ function relHTML(c, D, them) {
     <p class="reld">${esc(R.desc)}</p><div class="relp"><div><i style="width:${Math.round(R.conf * 100)}%"></i></div><span>Độ chắc ${Math.round(R.conf * 100)}%</span></div></div>`;
   const gauge = (v, l, col) => `<div class="gauge"><div class="gr" style="--v:${v};--gc:${col}"><b>${v}</b></div><small>${l}</small></div>`;
   h += `<div class="blk"><div class="bh"><b>Chỉ số</b></div><div class="gg">${gauge(g.close, 'Độ thân thiết', 'var(--cy)')}${gauge(g.romance, 'Độ “tình”', 'var(--pk)')}${gauge(g.balance, 'Độ cân bằng', 'var(--am)')}${gauge(g.init, 'Bạn chủ động', 'var(--vi)')}</div></div>`;
+  if (c.g) {
+    const gx = (lab, key, g) => {
+      const cur = gOver[key] || '', txt = g.hand ? 'bạn đã chọn' : g.p === 0.5 ? 'chưa đủ dấu hiệu' : `máy đoán ${g.p >= 0.5 ? 'nam' : 'nữ'} ${Math.min(95, Math.round(Math.max(g.p, 1 - g.p) * 100))}%`;
+      return `<div class="gp"><div class="gpn"><b>${lab}</b><small>${txt}</small></div><div class="gseg" data-k="${esc(key)}"><button type="button" data-g="m" aria-pressed="${cur === 'm' || (!cur && g.p >= 0.6)}" class="${cur === 'm' ? 'set' : ''}">👦 Nam</button><button type="button" data-g="f" aria-pressed="${cur === 'f' || (!cur && g.p <= 0.4)}" class="${cur === 'f' ? 'set' : ''}">👧 Nữ</button><button type="button" data-g="" aria-pressed="${!cur}">Tự đoán</button></div></div>`;
+    };
+    h += `<div class="blk"><div class="bh"><b>Giới tính</b><span class="mute">đoán từ tên & cách xưng hô · chạm để sửa</span></div>${gx('Bạn', '__me', c.g.me)}${gx(them, 'n:' + c.name, c.g.them)}</div>`;
+  }
   if (R.reasons.length) h += `<div class="blk"><div class="bh"><b>Vì sao máy đoán vậy?</b></div><ul class="sum">${R.reasons.map(x => `<li><i></i><span>${esc(x)}</span></li>`).join('')}</ul></div>`;
   h += '<div class="blk"><div class="bh"><b>Các khả năng</b></div>';
   for (const p of R.probs.slice(0, 6)) h += `<div class="prow"><span class="pe">${p.emoji}</span><span class="pl">${esc(p.label)}</span><span class="pb"><i style="width:${Math.max(2, Math.round(p.p * 100))}%"></i></span><span class="pv">${Math.round(p.p * 100)}%</span></div>`;
-  h += `</div><p class="disc">🎲 Chỉ mang tính giải trí: máy đoán dựa trên cách xưng hô, từ ngữ, giờ giấc, tốc độ rep và độ “nhiệt” của hai bên (${fmt(D.N)} tin) — có thể sai, đừng giận ${them} nha 😉</p>`;
+  h += `</div><p class="disc">🎲 Chỉ mang tính giải trí: máy đoán dựa trên giới tính, câu thả thính, cách xưng hô, từ ngữ, giờ giấc, tốc độ rep và độ “nhiệt” của hai bên (${fmt(D.N)} tin) — có thể sai, đừng giận ${them} nha 😉</p>`;
   return h;
 }
 
@@ -2014,6 +2132,10 @@ $('demo').onclick = () => {
     lop: [['hôm nay cậu đi học có mệt không, nhớ ăn uống đầy đủ nha', 'tớ mua trà sữa cho cậu nhé', 'cậu ngủ chưa?', 'tớ nhớ cậu', 'chúc cậu ngủ ngon nha 🥺', 'sao cậu không trả lời tớ?'], ['ừ', 'ok', 'k', 'để xem', 'bận rồi', 'ừm']],
     fam: [['con về rồi mẹ ơi', 'dạ', 'con ăn rồi ạ', 'mẹ ơi con xin tiền đóng học'], ['con ăn cơm chưa', 'về sớm nhé con', 'mẹ chuyển tiền rồi đó', 'nhớ mặc ấm vào']],
     grp: [['mai kiểm tra toán à', 'ai làm bài tập chưa', 'haha', 'đi ăn không mọi người'], ['chưa làm', 'chép không', '=))', 'đi đi']],
+    mm: [['cậu làm bài tập lý chưa', 'mai kiểm tra à', 'haha', 'trà sữa ở đâu ngon', 'tối nay xem phim gì', 'ok', 'cậu ăn tối chưa'], ['làm rồi nè', 'ừ mai kiểm tra', '=))', 'quán đầu ngõ ngon lắm', 'chưa biết nữa', 'ăn rồi', 'hihi']],
+    mmF: [['tự nhiên nhớ cậu ghê', 'cậu có người yêu chưa', 'hôm nay cậu xinh quá 😳'], ['cậu dễ thương ghê á', 'tớ mơ thấy cậu đó 🙈', 'nhớ tớ không']],
+    mmD: ['haha điên à', 'xàm', 'ảo thật đấy', 'thôi đi ngủ đây', 'ừ'],
+    anhem: [['anh em mình đi đá bóng không', 'tao gánh team cho', 'em ơi on game', 'ông feed vãi =))', 'mai đi nhậu không bro'], ['on đây anh', 'mày gà vãi', 'anh ơi đợi em tí', 'nhớ anh em cũ ghê =))', 'ok bro']],
   };
   const make = (name, people, n, y0, style, meR, kind = 'dm') => {
     const a = Date.UTC(y0, 0, 1), b = Date.UTC(2025, 10, 20), msgs = [], step = (b - a) / n;
@@ -2022,7 +2144,10 @@ $('demo').onclick = () => {
       t += rnd() < 0.85 ? rnd() * 240e3 : step * 6 * rnd();
       if (t > b) t = b - rnd() * 864e5;
       const me = rnd() < meR;
-      msgs.push({ t, from: me ? 'ban.cua.toi' : pick(people), text: rnd() < 0.07 ? 'https://www.tiktokv.com/share/video/7300000000000000000/' : pick(POOL[style][me ? 0 : 1]) });
+      let text = rnd() < 0.07 ? 'https://www.tiktokv.com/share/video/7300000000000000000/' : pick(POOL[style][me ? 0 : 1]);
+      // mập mờ: lâu lâu một bên thả thính, bên kia thường lờ đi
+      if (style === 'mm' && rnd() < 0.035) { msgs.push({ t, from: me ? 'ban.cua.toi' : pick(people), text: pick(POOL.mmF[me ? 0 : 1]) }); t += 60e3 + rnd() * 600e3; text = pick(POOL.mmD); msgs.push({ t, from: me ? pick(people) : 'ban.cua.toi', text }); continue; }
+      msgs.push({ t, from: me ? 'ban.cua.toi' : pick(people), text });
     }
     return { name, kind, msgs };
   };
@@ -2032,6 +2157,8 @@ $('demo').onclick = () => {
     make('Nhóm Bạn Thân', ['linh', 'huy', 'nam'], 3194, 2023, 'grp', 0.25, 'group'),
     make('crush.cua.toi', ['crush.cua.toi'], 861, 2024, 'lop', 0.75),
     make('mẹ yêu', ['mẹ yêu'], 343, 2025, 'fam', 0.45),
+    make('ngoc.linh', ['ngoc.linh'], 2410, 2024, 'mm', 0.5),
+    make('hung.tran99', ['hung.tran99'], 1630, 2024, 'anhem', 0.5),
   ]);
   show(list, 'Dữ liệu mẫu, không phải dữ liệu thật');
   toast('Đây là dữ liệu mẫu. Chọn file thật để đếm.');
