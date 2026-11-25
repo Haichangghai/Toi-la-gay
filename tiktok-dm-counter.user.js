@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TikTok DM Counter
 // @namespace    local.tiktok.dmcounter
-// @version      7.3.0
+// @version      7.4.0
 // @description  Đếm chính xác tổng số tin nhắn với từng người trên TikTok web, phân tích chủ đề hay nói, đoán mối quan hệ (bạn bè, mập mờ, lốp, người yêu…), cập nhật nhanh chỉ tin mới, xếp hạng, lưu ảnh kết quả và spam nhãn dán / emoji (chọn nhãn dán & tốc độ). Mọi phân tích chạy ngay trên máy bạn.
 // @match        https://www.tiktok.com/*
 // @match        https://tiktok.com/*
@@ -16,7 +16,7 @@
   if (window.__dmcV7) return;
   window.__dmcV7 = true;
 
-  const VERSION = '7.3.0';
+  const VERSION = '7.4.0';
   const SPEED = Number(window.__dmcTestSpeed) || 1; // chỉ dùng khi test tự động
   const sleep = ms => new Promise(r => setTimeout(r, ms * SPEED));
   const tick0 = () => new Promise(r => setTimeout(r, 0));
@@ -3330,7 +3330,11 @@
     const sent = LV.spam.sent;
     if (test && !err) { toast(sent ? `🧪 Gửi thử thành công${SP.kind === 'sticker' && SP.good ? ' bằng cách: ' + WAYS[SP.good] : ''} ✓` : '🧪 Gửi thử chưa được. Thử “Dạy” nút gửi, hoặc đổi “Cách gửi nhãn dán”.', 5000); LV.spam = null; keepAwake(false); S.running = false; islandOn(false); setTimeout(() => openSheet('spam'), 800); return; }
     LV.spam = null; keepAwake(false); S.running = false; islandOn(false);
-    toast(err ? '⚠ ' + err : `${S.stop ? 'Đã dừng. ' : ''}Đã gửi ${fmt(sent)} ${unit} ✓`, err ? 6500 : 3000);
+    // gửi xong trọn một lượt (không lỗi, không bị dừng tay) → mời bấm một cái để chạy lượt nữa
+    const more = !err && !S.stop && sent >= n;
+    toast(err ? '⚠ ' + err : `${S.stop ? 'Đã dừng. ' : ''}Đã gửi ${fmt(sent)} ${unit} ✓`,
+      err ? 6500 : more ? 9000 : 3000,
+      more ? { label: `Gửi tiếp ${fmt(n)}`, fn: () => { hideToast(); runSpam(); } } : null);
   }
 
   /* ---------- cài đặt ---------- */
