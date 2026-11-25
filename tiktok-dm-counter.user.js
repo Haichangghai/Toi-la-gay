@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TikTok DM Counter
 // @namespace    local.tiktok.dmcounter
-// @version      7.2.0
+// @version      7.3.0
 // @description  Đếm chính xác tổng số tin nhắn với từng người trên TikTok web, phân tích chủ đề hay nói, đoán mối quan hệ (bạn bè, mập mờ, lốp, người yêu…), cập nhật nhanh chỉ tin mới, xếp hạng, lưu ảnh kết quả và spam nhãn dán / emoji (chọn nhãn dán & tốc độ). Mọi phân tích chạy ngay trên máy bạn.
 // @match        https://www.tiktok.com/*
 // @match        https://tiktok.com/*
@@ -16,7 +16,7 @@
   if (window.__dmcV7) return;
   window.__dmcV7 = true;
 
-  const VERSION = '7.2.0';
+  const VERSION = '7.3.0';
   const SPEED = Number(window.__dmcTestSpeed) || 1; // chỉ dùng khi test tự động
   const sleep = ms => new Promise(r => setTimeout(r, ms * SPEED));
   const tick0 = () => new Promise(r => setTimeout(r, 0));
@@ -1999,7 +1999,9 @@
   .cq button{height:32px;padding:0 11px;border-radius:99px;font-size:12.5px;font-weight:750;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#c9c9d3}
   .cq button.on{background:#fff;color:#0b0b10}
   .spwarn{font-size:12.5px;line-height:1.5;color:#FFD38A;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.22);border-radius:15px;padding:10px 12px;margin-top:14px}
-  #spGo{margin-top:14px}
+  #spGo{margin-top:10px}
+  .sptest{width:100%;height:44px;margin-top:12px;border-radius:15px;background:rgba(255,255,255,.1);font-weight:800;font-size:14px}
+  .sptest:disabled{opacity:.4}
   .sprow{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:12px;font-weight:850;letter-spacing:.6px;text-transform:uppercase;color:#8a8a97}
   .sprow .lnk{text-transform:none;letter-spacing:0}
   .sprow .lnk.on{background:rgba(37,244,238,.16)}
@@ -2103,7 +2105,11 @@
         <div class="grp">Tốc độ</div>
         <div class="segs four" id="spSpd"></div>
         <label class="set"><div><b>Nhịp tự nhiên</b><small>Mỗi lần gửi lệch ±25% cho giống người thật</small></div><input type="checkbox" id="spJit"><i class="sw"></i></label>
+        <div class="grp">Gửi tự động</div>
+        <div class="set"><div><b>Nút gửi ➤</b><small id="spSendInfo"></small></div><button id="spTeach">Dạy</button></div>
+        <div class="set"><div><b>Cách gửi nhãn dán</b><small id="spWayInfo"></small></div><button id="spWay"></button></div>
         <div class="spwarn">⚠️ Gửi quá nhiều, quá nhanh có thể khiến TikTok tạm khoá tính năng nhắn tin của bạn. Mỗi lượt tối đa 100 lần, tự dừng nếu bạn chuyển sang người khác — dùng vui với bạn bè thôi nhé.</div>
+        <button class="sptest" id="spTest">🧪 Gửi thử 1 cái</button>
         <button class="go" id="spGo"><i class="sh"></i>${I.bolt}<span id="spGoT">Bắt đầu spam</span></button>
       </div>
 
@@ -2938,8 +2944,8 @@
 
   /* ---------- spam nhãn dán / emoji ---------- */
   // TikTok bản web không có bảng nhãn dán → script tự vẽ nhãn dán rồi gửi như một tấm ảnh (qua nút gửi ảnh của TikTok)
-  const SP = Object.assign({ kind: 'sticker', stk: 'p:0', stkRand: false, text: '❤️', rand: false, n: 10, spd: 1000, jit: true }, store.get('dmcSpam2') || {});
-  const saveSP = () => store.set('dmcSpam2', { kind: SP.kind, stk: SP.stk, stkRand: SP.stkRand, text: SP.text, rand: SP.rand, n: SP.n, spd: SP.spd, jit: SP.jit });
+  const SP = Object.assign({ kind: 'sticker', stk: 'p:0', stkRand: false, text: '❤️', rand: false, n: 10, spd: 1000, jit: true, way: 'auto', good: '', bad: [], sendAt: null }, store.get('dmcSpam2') || {});
+  const saveSP = () => store.set('dmcSpam2', { kind: SP.kind, stk: SP.stk, stkRand: SP.stkRand, text: SP.text, rand: SP.rand, n: SP.n, spd: SP.spd, jit: SP.jit, way: SP.way, good: SP.good, bad: SP.bad, sendAt: SP.sendAt });
   let MY = Array.isArray(store.get('dmcStk')) ? store.get('dmcStk') : []; // nhãn dán của bạn: {id, e, c} (tự tạo) hoặc {id, img} (ảnh)
   const saveMY = () => { MY = MY.slice(-16); if (!store.set('dmcStk', MY)) { MY.shift(); store.set('dmcStk', MY); toast('Bộ nhớ đầy, đã bỏ bớt nhãn dán cũ nhất'); } };
   const SP_SPEEDS = [[2000, '🐢 Chậm', '2 giây/lần'], [1000, 'Vừa', '1 giây/lần'], [600, '⚡ Nhanh', '0,6 giây/lần'], [350, '🚀 Siêu tốc', '0,35 giây/lần']];
@@ -3028,12 +3034,33 @@
     const t = (inp.isContentEditable && document.activeElement && inp.contains(document.activeElement) && document.activeElement) || inp;
     t.dispatchEvent(new KeyboardEvent('keydown', k)); t.dispatchEvent(new KeyboardEvent('keypress', k)); t.dispatchEvent(new KeyboardEvent('keyup', k));
   }
-  function clearInput(inp) {
-    if (!inputText(inp).trim()) return;
+  // TikTok dùng bộ soạn thảo rất "nhạy": KHÔNG BAO GIỜ sửa thẳng chữ trong ô nhập (làm TikTok báo "Đã xảy ra lỗi").
+  // Chỉ thao tác như người thật: chọn chữ → gõ đè (insertText) hoặc dán (paste).
+  // chọn ĐÚNG phần chữ (không chọn cả khung bên trong ô nhập, tránh làm TikTok vỡ cấu trúc ô nhập)
+  function selectText(inp) {
     inp.focus();
-    if (inp.isContentEditable) { try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch {} if (inputText(inp).trim()) inp.textContent = ''; }
-    else { const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(inp), 'value'); if (d && d.set) d.set.call(inp, ''); else inp.value = ''; }
-    inp.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'deleteContentBackward' }));
+    try {
+      const tw = document.createTreeWalker(inp, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.nodeValue.length ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+      const first = tw.nextNode(); let last = first;
+      for (let n; (n = tw.nextNode());) last = n;
+      const r = document.createRange();
+      if (first) { r.setStart(first, 0); r.setEnd(last, last.nodeValue.length); }
+      else { let e = inp; while (e.lastElementChild && e.lastElementChild.tagName !== 'BR') e = e.lastElementChild; r.selectNodeContents(e); r.collapse(true); }
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch {}
+    try { document.dispatchEvent(new Event('selectionchange')); } catch {}
+  }
+  function pasteText(inp, txt) {
+    const dt = new DataTransfer(); dt.setData('text/plain', txt);
+    let ev = null;
+    try { ev = new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }); } catch {}
+    if (!ev || !ev.clipboardData) { ev = new Event('paste', { bubbles: true, cancelable: true }); Object.defineProperty(ev, 'clipboardData', { value: dt }); }
+    inp.dispatchEvent(ev);
+  }
+  // TikTok sập khung chat ("Đã xảy ra lỗi")?
+  function crashed() {
+    if (findInput()) return false;
+    return /Đã xảy ra lỗi|Something went wrong|Vui lòng thử lại sau|try again later|Oops/i.test((document.body.innerText || '').slice(0, 30000));
   }
   // theo dõi khung chat: có tin mới xuất hiện thật hay chưa
   function watchChat() {
@@ -3042,46 +3069,115 @@
     if (mo) mo.observe(sc, { childList: true, subtree: true });
     return { get added() { return added; }, stop() { if (mo) mo.disconnect(); }, none: !mo };
   }
+  // nút gửi: đã dạy → dùng đúng nút đó; chưa dạy → tự tìm
+  function sendBtn(inp) {
+    const T = SP.sendAt;
+    if (T) {
+      const ir = rectOf(inp), x = ir.right + T.dx, y = ir.top + ir.height / 2 + T.dy;
+      if (x > 0 && y > 0 && x < innerWidth && y < innerHeight) {
+        const prev = HOST.style.visibility; HOST.style.visibility = 'hidden';
+        const hit = document.elementFromPoint(x, y); HOST.style.visibility = prev;
+        if (hit && !inp.contains(hit) && !hit.contains(inp)) return hit.closest('button,[role="button"],[tabindex]') || hit;
+      }
+    }
+    return findSendBtn(inp);
+  }
+  function teachSend() {
+    closeSheet();
+    const done = msg => { window.removeEventListener('click', on, true); hideToast(); if (msg) toast(msg, 3500); setTimeout(() => openSheet('spam'), 600); };
+    const on = e => {
+      if (ours(e.target)) return;
+      const inp = findInput();
+      if (!inp) { done('Hãy mở cuộc trò chuyện trước'); return; }
+      const ir = rectOf(inp), el = e.target.closest('button,[role="button"],[tabindex],svg') || e.target, r = rectOf(el);
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); // chỉ ghi nhớ, không gửi
+      if (el.contains(inp) || inp.contains(el)) { toast('Đó là ô nhập. Hãy chạm vào mũi tên gửi ➤', 0, { label: 'Huỷ', fn: () => done('') }); return; }
+      SP.sendAt = { dx: Math.round(r.left + r.width / 2 - ir.right), dy: Math.round(r.top + r.height / 2 - (ir.top + ir.height / 2)) };
+      saveSP(); done('Đã nhớ nút gửi ✓ Từ giờ script tự bấm nút này');
+    };
+    window.addEventListener('click', on, true);
+    toast('Chạm vào mũi tên gửi ➤ của TikTok (chỉ ghi nhớ, không gửi gì)', 0, { label: 'Huỷ', fn: () => done('') });
+  }
   async function sendText(txt) {
     const inp = findInput();
     if (!inp) return false;
-    inp.focus();
-    if (inp.isContentEditable) {
-      try { document.execCommand('selectAll', false, null); document.execCommand('insertText', false, txt); } catch {}
-      if (!inputText(inp).includes(txt)) { inp.textContent = txt; inp.dispatchEvent(new InputEvent('input', { bubbles: true, data: txt, inputType: 'insertText' })); }
-    } else {
-      const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(inp), 'value');
-      if (d && d.set) d.set.call(inp, txt); else inp.value = txt;
-      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    // 1) dán chữ: TikTok tự chèn (an toàn nhất)  2) không được thì gõ đè đúng phần chữ
+    selectText(inp);
+    await sleepR(50);
+    pasteText(inp, txt);
+    await sleepR(80);
+    if (!inputText(inp).includes(txt) && findInput() === inp) {
+      selectText(inp); await sleepR(50);
+      try { document.execCommand('insertText', false, txt); } catch {}
+      await sleepR(60);
     }
-    await sleepR(60);
+    if (crashed()) throw new Error('CRASH');
+    if (!inputText(inp).includes(txt)) return false;
+    const w = watchChat();
     pressEnter(inp);
-    await sleepR(160);
-    if (inputText(inp).trim()) { const b = findSendBtn(inp); if (b) { tap(b); await sleepR(160); } }
+    await waitFor(() => !inputText(inp).trim() || w.added, 400, () => S.stop);
+    if (inputText(inp).trim() && !S.stop) { const b = sendBtn(inp); if (b) { tap(b); await waitFor(() => !inputText(inp).trim(), 600, () => S.stop); } }
+    w.stop();
+    if (crashed()) throw new Error('CRASH');
     return !inputText(inp).trim();
+  }
+  // ảnh trong khu vực ô nhập (TikTok hiện ảnh xem trước trước khi gửi)
+  function composerImgs(inp) {
+    const sc = findScroller(); let box = inp;
+    for (let i = 0; i < 5 && box.parentElement; i++) box = box.parentElement;
+    return qsa(box, 'img').filter(im => !(sc && sc.contains(im)) && !ours(im) && visible(im)).length;
+  }
+  const WAYS = { paste: 'Dán ảnh', drop: 'Kéo thả ảnh', file: 'Chọn ảnh' };
+  async function imageVia(way, file, inp) {
+    const mk = () => { const d = new DataTransfer(); d.items.add(file); return d; };
+    const pv0 = composerImgs(inp), w = watchChat();
+    if (way === 'paste') {
+      inp.focus();
+      let ev = null; const d = mk();
+      try { ev = new ClipboardEvent('paste', { clipboardData: d, bubbles: true, cancelable: true }); } catch {}
+      if (!ev || !ev.clipboardData) { ev = new Event('paste', { bubbles: true, cancelable: true }); Object.defineProperty(ev, 'clipboardData', { value: d }); }
+      inp.dispatchEvent(ev);
+    } else if (way === 'drop') {
+      const d = mk(), r = rectOf(inp);
+      for (const type of ['dragenter', 'dragover', 'drop']) {
+        let ev = null;
+        try { ev = new DragEvent(type, { dataTransfer: d, bubbles: true, cancelable: true, clientX: r.left + 20, clientY: r.top + r.height / 2 }); } catch {}
+        if (!ev || !ev.dataTransfer) { ev = new Event(type, { bubbles: true, cancelable: true }); Object.defineProperty(ev, 'dataTransfer', { value: d }); }
+        inp.dispatchEvent(ev);
+      }
+    } else {
+      const fi = findFileInput(inp);
+      if (!fi) { w.stop(); return 'none'; }
+      try { fi.files = mk().files; } catch { w.stop(); return 'none'; }
+      fi.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    await waitFor(() => w.added || composerImgs(inp) > pv0 || crashed(), 1500, () => S.stop);
+    if (crashed()) { w.stop(); return 'crash'; }
+    if (!w.added && composerImgs(inp) > pv0 && !S.stop) {
+      // ảnh đang ở dạng xem trước → tự bấm gửi
+      const b = sendBtn(inp); if (b) tap(b); else pressEnter(inp);
+      await waitFor(() => w.added || crashed(), 8000, () => S.stop);
+    } else if (!w.added) await waitFor(() => w.added || crashed(), 2500, () => S.stop); // tải ảnh lên chậm
+    w.stop();
+    if (crashed()) return 'crash';
+    try { if (way === 'file') findFileInput(inp).value = ''; } catch {}
+    return w.added || w.none ? 'ok' : 'none';
   }
   async function sendImage(blob, name) {
     const inp = findInput(); if (!inp) return false;
-    const fi = findFileInput(inp);
-    if (!fi) throw new Error('Không tìm thấy nút gửi ảnh của TikTok trong khung chat này.');
-    clearInput(inp);
     const file = new File([blob], name, { type: blob.type || 'image/png' });
-    const w = watchChat();
-    try {
-      const dt = new DataTransfer(); dt.items.add(file);
-      fi.files = dt.files;
-    } catch { w.stop(); throw new Error('Trình duyệt này không cho script gửi ảnh. Hãy cập nhật Safari / iPadOS rồi thử lại.'); }
-    fi.dispatchEvent(new Event('input', { bubbles: true })); fi.dispatchEvent(new Event('change', { bubbles: true }));
-    // TikTok có thể gửi ngay, hoặc hiện ảnh xem trước chờ bấm gửi
-    await waitFor(() => w.added, 1800, () => S.stop);
-    if (!w.added && !S.stop) {
-      const b = findSendBtn(inp);
-      if (b) tap(b); else pressEnter(inp);
-      await waitFor(() => w.added, 7000, () => S.stop);
+    const bad = new Set(SP.bad || []);
+    let order = SP.way !== 'auto' ? [SP.way] : [SP.good, 'paste', 'drop', 'file'].filter((x, i, a) => x && a.indexOf(x) === i && !bad.has(x));
+    if (!order.length) order = ['paste', 'drop', 'file'];
+    for (const way of order) {
+      if (S.stop) return false;
+      const cur = findInput(); if (!cur) break;
+      LV.phase = `${LV.phase.split(' · ')[0]} · cách: ${WAYS[way]}`;
+      const r = await imageVia(way, file, cur);
+      if (r === 'ok') { if (SP.good !== way) { SP.good = way; saveSP(); } return true; }
+      if (r === 'crash') { SP.bad = [...bad.add(way)]; if (SP.good === way) SP.good = ''; saveSP(); throw new Error('CRASH:' + way); }
     }
-    w.stop();
-    try { fi.value = ''; } catch {}
-    return w.none ? true : w.added;
+    return false;
   }
 
   /* nhãn dán của bạn: tự tạo, tải ảnh lên, lấy từ khung chat */
@@ -3158,9 +3254,15 @@
     const sp = $('spSpd'); sp.textContent = '';
     for (const [ms, l, d] of SP_SPEEDS) { const b = document.createElement('button'); b.className = SP.spd === ms ? 'on' : ''; b.innerHTML = `<b>${l}</b><small>${d}</small>`; b.onclick = () => { SP.spd = ms; saveSP(); renderSpam(); }; sp.appendChild(b); }
     $('spJit').checked = !!SP.jit;
+    $('spSendInfo').textContent = SP.sendAt ? 'Đã dạy ✓ — script tự bấm đúng nút này' : 'Chưa dạy — script tự tìm mũi tên ➤ bên phải ô nhập';
+    $('spTeach').textContent = SP.sendAt ? 'Dạy lại' : 'Dạy';
+    const bad = (SP.bad || []).map(x => WAYS[x]).filter(Boolean);
+    $('spWay').textContent = SP.way === 'auto' ? 'Tự động' : WAYS[SP.way];
+    $('spWayInfo').textContent = SP.way === 'auto' ? `Thử lần lượt: dán ảnh → kéo thả → chọn ảnh${SP.good ? ` · đang dùng: ${WAYS[SP.good]} ✓` : ''}${bad.length ? ` · bỏ qua (từng làm TikTok lỗi): ${bad.join(', ')}` : ''}` : 'Chỉ dùng đúng cách này (bấm để đổi)';
+    $('spTest').disabled = $('spGo').disabled = false;
     const what = SP.kind === 'sticker' ? (SP.stkRand ? 'nhãn dán ngẫu nhiên' : 'nhãn dán') : SP.rand ? 'emoji ngẫu nhiên' : `“${short(SP.text, 12)}”`;
     $('spGoT').textContent = `Spam ${fmt(SP.n)} ${what}`;
-    $('spGo').disabled = !(sc && inp) || (SP.kind === 'sticker' && !SP.stkRand && !stkList().some(s => s.id === SP.stk)) || (SP.kind === 'text' && !SP.rand && !SP.text.trim());
+    $('spTest').disabled = $('spGo').disabled = !(sc && inp) || (SP.kind === 'sticker' && !SP.stkRand && !stkList().some(s => s.id === SP.stk)) || (SP.kind === 'text' && !SP.rand && !SP.text.trim());
   }
   function mkPrev() { $('spMkPrev').src = drawSticker($('spMkE').value.trim() || '😴', $('spMkC').value.trim(), 160).toDataURL('image/png'); }
   $('spMkE').oninput = mkPrev; $('spMkC').oninput = mkPrev;
@@ -3175,14 +3277,17 @@
   for (const b of $('spCq').querySelectorAll('button')) b.onclick = () => setN(b.dataset.n);
   $('spJit').onchange = () => { SP.jit = $('spJit').checked; saveSP(); };
   $('spGo').onclick = () => runSpam();
+  $('spTest').onclick = () => runSpam(true);
+  $('spTeach').onclick = teachSend;
+  $('spWay').onclick = () => { const L = ['auto', 'paste', 'drop', 'file']; SP.way = L[(L.indexOf(SP.way) + 1) % L.length]; if (SP.way === 'auto') SP.bad = []; saveSP(); renderSpam(); };
 
-  async function runSpam() {
+  async function runSpam(test) {
     if (S.running) return;
     const sc = findScroller(), title = sc ? chatName(sc) : '';
     if (!sc || !findInput()) { toast('Hãy mở một cuộc trò chuyện trước'); return; }
     const L = stkList(), pick = () => (SP.stkRand ? L[Math.floor(Math.random() * L.length)] : L.find(s => s.id === SP.stk));
     if (SP.kind === 'sticker' && !pick()) { toast('Chọn một nhãn dán trước'); return; }
-    const n = clamp(SP.n, 1, SP_MAX), gap = Math.max(SP_MIN_GAP, SP.spd), unit = SP.kind === 'sticker' ? 'nhãn dán' : 'tin';
+    const n = test ? 1 : clamp(SP.n, 1, SP_MAX), gap = Math.max(SP_MIN_GAP, SP.spd), unit = SP.kind === 'sticker' ? 'nhãn dán' : 'tin';
     S.running = true; S.stop = false;
     closeSheet(); islandOn(true);
     $('fStop').textContent = 'Dừng';
@@ -3197,6 +3302,7 @@
     const blobs = new Map();
     try {
       for (let i = 0; i < n && !S.stop; i++) {
+        if (crashed()) throw new Error('CRASH');
         const s2 = findScroller();
         if (!s2 || (title && !sameName(chatName(s2), title))) throw new Error('Cuộc trò chuyện đã đổi — dừng lại để không gửi nhầm người.');
         LV.phase = `Đang gửi ${i + 1}/${n} · ${(gap / 1000).toLocaleString('vi-VN')} giây/lần`;
@@ -3213,9 +3319,16 @@
         }
         if (i < n - 1) await sleepR(SP.jit ? gap * (0.75 + Math.random() * 0.5) : gap);
       }
-    } catch (e) { err = String((e && e.message) || e); }
+    } catch (e) {
+      err = String((e && e.message) || e);
+      if (/^CRASH/.test(err)) {
+        const w = err.split(':')[1];
+        err = `TikTok báo lỗi khi nhận ${w ? '“' + WAYS[w] + '”' : 'tin'}. Script đã ghi nhớ để lần sau dùng cách khác. Kéo xuống để tải lại trang TikTok rồi thử lại.`;
+      }
+    }
     clearInterval(LV.timer); livePaint();
     const sent = LV.spam.sent;
+    if (test && !err) { toast(sent ? `🧪 Gửi thử thành công${SP.kind === 'sticker' && SP.good ? ' bằng cách: ' + WAYS[SP.good] : ''} ✓` : '🧪 Gửi thử chưa được. Thử “Dạy” nút gửi, hoặc đổi “Cách gửi nhãn dán”.', 5000); LV.spam = null; keepAwake(false); S.running = false; islandOn(false); setTimeout(() => openSheet('spam'), 800); return; }
     LV.spam = null; keepAwake(false); S.running = false; islandOn(false);
     toast(err ? '⚠ ' + err : `${S.stop ? 'Đã dừng. ' : ''}Đã gửi ${fmt(sent)} ${unit} ✓`, err ? 6500 : 3000);
   }
