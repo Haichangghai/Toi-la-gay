@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         TikTok DM Counter
 // @namespace    local.tiktok.dmcounter
-// @version      7.0.0
-// @description  Đếm chính xác tổng số tin nhắn với từng người trên TikTok web, phân tích chủ đề hay nói, đoán mối quan hệ (bạn bè, mập mờ, lốp, người yêu…), cập nhật nhanh chỉ tin mới, xếp hạng và lưu ảnh kết quả. Mọi phân tích chạy ngay trên máy bạn.
+// @version      7.1.0
+// @description  Đếm chính xác tổng số tin nhắn với từng người trên TikTok web, phân tích chủ đề hay nói, đoán mối quan hệ (bạn bè, mập mờ, lốp, người yêu…), cập nhật nhanh chỉ tin mới, xếp hạng, lưu ảnh kết quả và spam nhãn dán / emoji (chọn nhãn dán & tốc độ). Mọi phân tích chạy ngay trên máy bạn.
 // @match        https://www.tiktok.com/*
 // @match        https://tiktok.com/*
 // @grant        none
@@ -16,7 +16,7 @@
   if (window.__dmcV7) return;
   window.__dmcV7 = true;
 
-  const VERSION = '7.0.0';
+  const VERSION = '7.1.0';
   const SPEED = Number(window.__dmcTestSpeed) || 1; // chỉ dùng khi test tự động
   const sleep = ms => new Promise(r => setTimeout(r, ms * SPEED));
   const tick0 = () => new Promise(r => setTimeout(r, 0));
@@ -1631,10 +1631,10 @@
   .ib:active{transform:scale(.92)}
 
   /* menu chính dạng tab */
-  .seg{position:relative;flex:none;display:grid;grid-template-columns:repeat(3,1fr);margin:0 16px 10px;padding:4px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+  .seg{position:relative;flex:none;display:grid;grid-template-columns:repeat(4,1fr);margin:0 16px 10px;padding:4px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
   .seg button{position:relative;z-index:1;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13.5px;font-weight:750;color:#b9b9c4;transition:color .25s}
   .seg button.on{color:#fff}
-  .seg .pill{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:12px;
+  .seg .pill{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/4);border-radius:12px;
     background:linear-gradient(120deg,rgba(37,244,238,.22),rgba(139,92,246,.22),rgba(254,44,85,.22));border:1px solid rgba(255,255,255,.14);transition:transform .45s var(--spring)}
   .body{position:relative;flex:1 1 auto;min-height:0;overflow-y:auto;padding:2px 16px 18px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 
@@ -1951,6 +1951,41 @@
     padding:11px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.12);box-shadow:0 14px 34px rgba(0,0,0,.5);pointer-events:none}
   .toast.on{opacity:1;transform:translate(-50%,0)}
   .toast button{pointer-events:auto;height:30px;padding:0 11px;border-radius:10px;background:rgba(255,255,255,.12);font-size:12.5px;font-weight:750}
+  /* spam */
+  .seg button{gap:5px;font-size:13px}
+  .segs.two{grid-template-columns:1fr 1fr}
+  .segs.four{grid-template-columns:repeat(4,1fr)}
+  .segs button.on{border-color:rgba(37,244,238,.7);background:rgba(37,244,238,.1)}
+  .spto{display:flex;align-items:center;gap:10px;margin-top:14px;padding:11px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:13.5px}
+  .spto .av{width:36px;height:36px;font-size:14px}
+  .spto small{display:block;font-size:11.5px;color:var(--mut)}
+  .spto b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spto>div:last-child{min-width:0}
+  .spto.bad{color:#FFD38A;border-color:rgba(255,176,32,.3);background:rgba(255,176,32,.08)}
+  .stk{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px;margin-top:12px}
+  .stk .it{position:relative;aspect-ratio:1;border-radius:16px;background:var(--card);border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;font-size:30px}
+  .stk .it img{width:78%;height:78%;object-fit:contain}
+  .stk .it.on{border-color:var(--c);box-shadow:0 0 0 3px rgba(37,244,238,.2)}
+  .stk .it small{font-size:11px;padding:4px;text-align:center;color:var(--mut);line-height:1.2}
+  .stk .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);font-size:13px;display:grid;place-items:center;color:#fff;cursor:pointer}
+  .stk .add{border-style:dashed;color:var(--c);font-weight:800}
+  .stk .add span{font-size:24px;line-height:1}
+  .note{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.5}
+  .note b{color:#e6e6ee}
+  .emo{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .emo button{min-width:46px;height:46px;padding:0 10px;border-radius:14px;font-size:22px;background:var(--card);border:1.5px solid var(--line)}
+  .emo button.on{border-color:var(--c);background:rgba(37,244,238,.1)}
+  .emo button.rnd{font-size:13px;font-weight:800}
+  .sptxt{margin-top:10px}
+  .cnt{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .cnt>button{width:44px;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:20px;font-weight:800}
+  .cnt input{width:76px;height:44px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font-size:18px;font-weight:800;text-align:center;font-family:inherit;outline:none}
+  .cq{display:flex;gap:6px;flex-wrap:wrap}
+  .cq button{height:32px;padding:0 11px;border-radius:99px;font-size:12.5px;font-weight:750;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#c9c9d3}
+  .cq button.on{background:#fff;color:#0b0b10}
+  .spwarn{font-size:12.5px;line-height:1.5;color:#FFD38A;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.22);border-radius:15px;padding:10px 12px;margin-top:14px}
+  #spGo{margin-top:14px}
+  @media (max-width:400px){.seg button svg{display:none}}
   @media (max-width:370px){.chips{grid-template-columns:repeat(2,1fr)}.gg{grid-template-columns:repeat(2,1fr);row-gap:12px}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   `;
@@ -1966,7 +2001,7 @@
       <div class="acts"><button class="ib" id="bClose" aria-label="Đóng">${I.close}</button></div>
     </header>
     <nav class="seg" id="nav"><i class="pill" id="navPill"></i>
-      <button data-v="home" class="on">${I.chat}<span>Đếm</span></button><button data-v="rank">${I.trophy}<span>Xếp hạng</span></button><button data-v="set">${I.gear}<span>Cài đặt</span></button>
+      <button data-v="home" class="on">${I.chat}<span>Đếm</span></button><button data-v="rank">${I.trophy}<span>Xếp hạng</span></button><button data-v="spam">${I.bolt}<span>Spam</span></button><button data-v="set">${I.gear}<span>Cài đặt</span></button>
     </nav>
     <div class="body" id="body">
       <div id="vHome">
@@ -2019,6 +2054,29 @@
         <div class="podium" id="podium"></div>
         <div id="rlist"></div>
         <button class="lnk danger" id="kClear">Xoá lịch sử</button>
+      </div>
+
+      <div id="vSpam" hidden>
+        <h3 class="ttl">Spam nhãn dán</h3>
+        <p class="sub">Gửi liên tục vào cuộc trò chuyện đang mở trên TikTok.</p>
+        <div class="spto" id="spTo"></div>
+        <div class="grp">Gửi gì</div>
+        <div class="segs two" id="spKind"><button data-k="sticker"><b>🧸 Nhãn dán</b><small>Chọn từ bảng nhãn dán của TikTok</small></button><button data-k="text"><b>😀 Emoji / chữ</b><small>Gõ sẵn rồi gửi liên tục</small></button></div>
+        <div id="spStkBox">
+          <div class="stk" id="spStk"></div>
+          <p class="note">Bấm <b>＋ Thêm</b>, rồi trên TikTok: chạm nút mở nhãn dán, sau đó chạm vào nhãn dán muốn spam. Script chỉ ghi nhớ, <b>không gửi</b> lúc chọn.</p>
+        </div>
+        <div id="spTxtBox" hidden>
+          <div class="emo" id="spEmo"></div>
+          <div class="search sptxt"><input id="spText" maxlength="200" placeholder="Hoặc gõ nội dung muốn spam…" autocomplete="off"></div>
+        </div>
+        <div class="grp">Số lần (tối đa 100)</div>
+        <div class="cnt"><button id="spMinus" aria-label="Bớt">−</button><input id="spN" type="number" min="1" max="100" inputmode="numeric" aria-label="Số lần"><button id="spPlus" aria-label="Thêm">＋</button><div class="cq" id="spCq"><button data-n="5">5</button><button data-n="10">10</button><button data-n="20">20</button><button data-n="50">50</button><button data-n="100">100</button></div></div>
+        <div class="grp">Tốc độ</div>
+        <div class="segs four" id="spSpd"></div>
+        <label class="set"><div><b>Nhịp tự nhiên</b><small>Mỗi lần gửi lệch ±25% cho giống người thật</small></div><input type="checkbox" id="spJit"><i class="sw"></i></label>
+        <div class="spwarn">⚠️ Gửi quá nhiều, quá nhanh có thể khiến TikTok tạm khoá tính năng nhắn tin của bạn. Mỗi lượt tối đa 100 lần, tự dừng nếu bạn chuyển sang người khác — dùng vui với bạn bè thôi nhé.</div>
+        <button class="go" id="spGo"><i class="sh"></i>${I.bolt}<span id="spGoT">Bắt đầu spam</span></button>
       </div>
 
       <div id="vSet" hidden>
@@ -2199,7 +2257,7 @@
   layout();
 
   /* ---------- mở / đóng bảng, chuyển trang ---------- */
-  const NAV = ['home', 'rank', 'set'];
+  const NAV = ['home', 'rank', 'spam', 'set'];
   function setNav(v) {
     const i = Math.max(0, NAV.indexOf(v));
     $('navPill').style.transform = `translateX(${i * 100}%)`;
@@ -2207,13 +2265,14 @@
   }
   function show(v) {
     S.view = v;
-    for (const [k, id] of [['home', 'vHome'], ['res', 'vRes'], ['rank', 'vRank'], ['set', 'vSet']]) $(id).hidden = k !== v;
+    for (const [k, id] of [['home', 'vHome'], ['res', 'vRes'], ['rank', 'vRank'], ['spam', 'vSpam'], ['set', 'vSet']]) $(id).hidden = k !== v;
     $('cta').hidden = v !== 'home';
     $('body').scrollTop = 0;
     setNav(v === 'res' ? S.from : v);
     if (v === 'home') { S.anim = true; detect(true); }
     if (v === 'rank') renderRank();
     if (v === 'set') renderSet();
+    if (v === 'spam') renderSpam();
   }
   for (const b of $('nav').querySelectorAll('button')) b.onclick = () => show(b.dataset.v);
   function openSheet(v) {
@@ -2352,7 +2411,7 @@
   $('hQuick').onclick = () => run([], 'quick');
 
   /* ---------- đảo trạng thái khi đang đếm ---------- */
-  const LV = { t0: 0, last: { total: 0, me: 0, them: 0, media: 0 }, base: 0, samples: [], rates: [], phase: '', name: '', timer: 0 };
+  const LV = { spam: null, t0: 0, last: { total: 0, me: 0, them: 0, media: 0 }, base: 0, samples: [], rates: [], phase: '', name: '', timer: 0 };
   function liveStart(name, img, qi, n) {
     LV.t0 = Date.now(); LV.last = { total: 0, me: 0, them: 0, media: 0 }; LV.base = 0; LV.samples = []; LV.rates = []; LV.name = name || 'Cuộc trò chuyện';
     setAv($('fAv'), img, LV.name); setAv($('iAv'), img, LV.name);
@@ -2378,6 +2437,12 @@
     LV.rates.push(rate); if (LV.rates.length > 90) LV.rates.shift();
     $('fRate').textContent = fmt(Math.round(rate));
     drawSpark($('spark'), LV.rates);
+    if (LV.spam) {
+      const sp = LV.spam, p = sp.n ? (sp.sent / sp.n) * 100 : 0;
+      $('fA').style.width = p + '%'; $('fB').style.width = (100 - p) + '%';
+      $('fMe').textContent = `Đã gửi ${fmt(sp.sent)}/${fmt(sp.n)}`;
+      $('fThem').textContent = sp.fail ? `Lỗi ${fmt(sp.fail)}` : `Còn ${fmt(sp.n - sp.sent)}`;
+    }
   }
   function drawSpark(cv, arr) {
     const g = cv.getContext('2d'), W = cv.width, H = cv.height;
@@ -2841,6 +2906,232 @@
     if (Date.now() - clearArm > 3000) { clearArm = Date.now(); $('kClear').textContent = 'Bấm lần nữa để xoá hết'; setTimeout(() => { $('kClear').textContent = 'Xoá lịch sử'; }, 3000); return; }
     history = []; persistHistory(); $('kClear').textContent = 'Xoá lịch sử'; renderRank(); toast('Đã xoá lịch sử');
   };
+
+
+  /* ---------- spam nhãn dán / emoji ---------- */
+  const SP = Object.assign({ kind: 'sticker', stickers: [], sel: '', text: '❤️', rand: false, n: 10, spd: 1000, jit: true, opener: null }, store.get('dmcSpam') || {});
+  const saveSP = () => store.set('dmcSpam', { kind: SP.kind, stickers: SP.stickers.slice(-24), sel: SP.sel, text: SP.text, rand: SP.rand, n: SP.n, spd: SP.spd, jit: SP.jit, opener: SP.opener });
+  const SP_SPEEDS = [[2000, '🐢 Chậm', '2 giây/lần'], [1000, 'Vừa', '1 giây/lần'], [600, '⚡ Nhanh', '0,6 giây/lần'], [350, '🚀 Siêu tốc', '0,35 giây/lần']];
+  const SP_EMO = ['❤️', '😂', '🥺', '😘', '🔥', '👍', '🤡', '💀', '🙄', '😭', '🫶', '🐧'];
+  const SP_MAX = 100, SP_MIN_GAP = 350;
+  const bgUrl = el => { const m = (getComputedStyle(el).backgroundImage || '').match(/url\(["']?(.*?)["']?\)/); return m ? m[1] : ''; };
+  // từ chỗ chạm → khối nhãn dán (ô nhỏ có ảnh / ảnh nền / emoji, không phải avatar tròn)
+  function stickerRoot(t) {
+    for (let e = t, i = 0; e && e !== document.body && i < 5; e = e.parentElement, i++) {
+      const r = rectOf(e);
+      if (r.width > 240 || r.height > 240) break;
+      const img = e.matches('img,video,canvas') ? e : e.querySelector('img,video,canvas');
+      if ((img || bgUrl(e)) && r.width >= 20) {
+        const btn = e.closest('button,[role="button"],[tabindex]');
+        return btn && rectOf(btn).width <= 240 ? btn : e;
+      }
+    }
+    const tx = t.textContent.trim();
+    return tx && tx.length <= 12 && rectOf(t).width < 90 ? t : null;
+  }
+  function describe(el) {
+    if (!el) return null;
+    const img = el.matches('img') ? el : el.querySelector('img');
+    let src = (img && imgSrc(img)) || bgUrl(el);
+    if (!src) for (const x of el.querySelectorAll('*')) { src = bgUrl(x); if (src) break; }
+    const label = (el.getAttribute('aria-label') || el.getAttribute('title') || (img && img.alt) || '').trim().slice(0, 60);
+    const e2e = el.getAttribute('data-e2e') || '';
+    const text = src ? '' : el.textContent.trim().slice(0, 12);
+    if (!src && !label && !text && !e2e) return null;
+    const key = src ? avKey(src) || src.slice(0, 160) : '';
+    return { id: 'st' + Math.abs(hashStr(key + '|' + label + '|' + text + '|' + e2e)), key, src: src.slice(0, 600), label, text, e2e, sig: normSig(el) };
+  }
+  const climb = (e, sig) => { for (let x = e, i = 0; x && i < 5; x = x.parentElement, i++) if (normSig(x) === sig) return x; return e; };
+  // tìm lại nhãn dán / nút đã ghi nhớ trên trang
+  function locate(d) {
+    if (!d) return null;
+    const sc = findScroller();
+    // bỏ qua khung chat: nhãn dán vừa gửi cũng có cùng hình, bấm vào đó sẽ không gửi gì
+    const ok = e => !ours(e) && visible(e) && !(sc && sc.contains(e));
+    if (d.key) {
+      for (const im of document.querySelectorAll('img')) if (ok(im) && (avKey(imgSrc(im)) || imgSrc(im).slice(0, 160)) === d.key) return climb(im, d.sig);
+      for (const e of document.querySelectorAll('[style*="url("]')) if (ok(e) && avKey(bgUrl(e)) === d.key) return climb(e, d.sig);
+    }
+    if (d.e2e) { const e = qsa(document, `[data-e2e="${String(d.e2e).replace(/"/g, '\\"')}"]`).find(ok); if (e) return e; }
+    if (d.label) { const e = qsa(document, '[aria-label],[title],img[alt]').find(x => ok(x) && (x.getAttribute('aria-label') === d.label || x.getAttribute('title') === d.label || x.alt === d.label)); if (e) return climb(e, d.sig); }
+    if (d.text) {
+      const e = qsa(document, 'button,[role="button"],span,div,li').find(x => ok(x) && x.children.length <= 1 && x.textContent.trim() === d.text && rectOf(x).width < 90);
+      if (e) return e;
+    }
+    return null;
+  }
+  function tap(el) {
+    let r = rectOf(el);
+    if (r.bottom < 0 || r.top > innerHeight) { try { el.scrollIntoView({ block: 'nearest' }); } catch {} r = rectOf(el); }
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const prev = HOST.style.visibility; HOST.style.visibility = 'hidden';
+    const hit = document.elementFromPoint(x, y); HOST.style.visibility = prev;
+    const t = hit && el.contains(hit) ? hit : el;
+    const o = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, view: window };
+    try { t.dispatchEvent(new PointerEvent('pointerdown', { ...o, pointerId: 1, isPrimary: true, pointerType: 'mouse' })); } catch {}
+    t.dispatchEvent(new MouseEvent('mousedown', o));
+    try { t.dispatchEvent(new PointerEvent('pointerup', { ...o, pointerId: 1, isPrimary: true, pointerType: 'mouse' })); } catch {}
+    t.dispatchEvent(new MouseEvent('mouseup', o));
+    t.dispatchEvent(new MouseEvent('click', o));
+  }
+  async function sendSticker(d) {
+    let el = locate(d);
+    // bảng nhãn dán đã đóng sau lần gửi trước → mở lại bằng nút đã ghi nhớ
+    if (!el && SP.opener) { const op = locate(SP.opener); if (op) { tap(op); await waitFor(() => (el = locate(d)), 1600, () => S.stop); } }
+    if (!el) return false;
+    // chỉ tính là đã gửi khi thấy tin mới thật sự xuất hiện trong khung chat
+    const sc = findScroller();
+    let added = false;
+    const mo = sc ? new MutationObserver(rs => { if (rs.some(r => r.addedNodes.length)) added = true; }) : null;
+    if (mo) mo.observe(sc, { childList: true, subtree: true });
+    tap(el);
+    if (!mo) return true;
+    await waitFor(() => added, 1500, () => S.stop);
+    mo.disconnect();
+    return added;
+  }
+  const inputText = el => (el.isContentEditable ? el.textContent : el.value || '');
+  function findSendBtn(inp) {
+    for (let a = inp.parentElement, l = 0; a && l < 5; a = a.parentElement, l++) {
+      const c = qsa(a, '[data-e2e*="send" i],[aria-label*="send" i],[aria-label*="gửi" i],[title*="gửi" i],[title*="send" i]').filter(e => !ours(e) && visible(e) && !e.contains(inp));
+      if (c.length) return c[c.length - 1];
+    }
+    return null;
+  }
+  async function sendText(txt) {
+    const inp = findInput();
+    if (!inp) return false;
+    inp.focus();
+    if (inp.isContentEditable) {
+      try { document.execCommand('selectAll', false, null); document.execCommand('insertText', false, txt); } catch {}
+      if (!inputText(inp).includes(txt)) { inp.textContent = txt; inp.dispatchEvent(new InputEvent('input', { bubbles: true, data: txt, inputType: 'insertText' })); }
+    } else {
+      const set = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(inp), 'value');
+      if (set && set.set) set.set.call(inp, txt); else inp.value = txt;
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    await new Promise(r => setTimeout(r, 50 * SPEED));
+    const k = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+    inp.dispatchEvent(new KeyboardEvent('keydown', k)); inp.dispatchEvent(new KeyboardEvent('keypress', k)); inp.dispatchEvent(new KeyboardEvent('keyup', k));
+    await new Promise(r => setTimeout(r, 140 * SPEED));
+    if (inputText(inp).trim()) { const b = findSendBtn(inp); if (b) { tap(b); await new Promise(r => setTimeout(r, 120 * SPEED)); } }
+    return !inputText(inp).trim();
+  }
+
+  /* học nhãn dán: (1) chạm nút mở bảng nhãn dán (được phép mở), (2) chạm nhãn dán (bị chặn, KHÔNG gửi) */
+  function learnSticker() {
+    closeSheet();
+    let step = 1;
+    const done = msg => { window.removeEventListener('click', onClick, true); hideToast(); if (msg) toast(msg); setTimeout(() => openSheet('spam'), 500); };
+    const cancel = { label: 'Huỷ', fn: () => done('') };
+    const onClick = e => {
+      if (ours(e.target)) return;
+      const st = stickerRoot(e.target);
+      const sc = findScroller();
+      const inChat = sc && sc.contains(e.target);
+      if (step === 1 && !(st && !inChat && rectOf(st).width >= 36 && (st.matches('img') || st.querySelector('img') || bgUrl(st)))) {
+        const op = e.target.closest('button,[role="button"],[tabindex],svg') || e.target;
+        SP.opener = describe(op.closest('button,[role="button"],[tabindex]') || op);
+        step = 2;
+        toast('Bước 2/2: chạm vào nhãn dán muốn spam (chỉ ghi nhớ, không gửi)', 0, cancel);
+        return;
+      }
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      if (inChat) { toast('Đó là tin nhắn trong khung chat. Hãy chạm vào nhãn dán trong bảng nhãn dán của TikTok', 0, cancel); return; }
+      const d = describe(st || e.target);
+      if (!d) { toast('Không nhận ra nhãn dán này, thử chạm vào hình nhãn dán', 0, cancel); return; }
+      if (!SP.stickers.some(x => x.id === d.id)) SP.stickers.push(d);
+      SP.sel = d.id; SP.kind = 'sticker'; saveSP();
+      done('Đã lưu nhãn dán ✓');
+    };
+    window.addEventListener('click', onClick, true);
+    toast('Bước 1/2: chạm nút mở nhãn dán của TikTok (nếu bảng đã mở, chạm thẳng vào nhãn dán)', 0, cancel);
+  }
+
+  function renderSpam() {
+    const sc = findScroller(), title = sc ? findTitle(sc) : '', to = $('spTo');
+    to.className = 'spto' + (sc && findInput() ? '' : ' bad');
+    to.innerHTML = sc && findInput() ? '<div class="av"></div><div><small>Sẽ gửi vào cuộc trò chuyện với</small><b></b></div>' : '<div>⚠️ Hãy mở cuộc trò chuyện muốn spam trên TikTok trước</div>';
+    if (sc && findInput()) { setAv(to.querySelector('.av'), chatAvatar(sc), title || '?'); to.querySelector('b').textContent = title || 'Cuộc trò chuyện đang mở'; }
+    for (const b of $('spKind').querySelectorAll('button')) b.classList.toggle('on', b.dataset.k === SP.kind);
+    $('spStkBox').hidden = SP.kind !== 'sticker'; $('spTxtBox').hidden = SP.kind !== 'text';
+    // nhãn dán đã lưu
+    const g = $('spStk'); g.textContent = '';
+    for (const d of SP.stickers) {
+      const it = document.createElement('button');
+      it.className = 'it' + (d.id === SP.sel ? ' on' : '');
+      if (d.src && /^(https?:|data:image)/.test(d.src)) { const im = document.createElement('img'); im.src = d.src; im.alt = ''; im.onerror = () => { im.remove(); it.prepend(Object.assign(document.createElement('small'), { textContent: d.label || 'Nhãn dán' })); }; it.appendChild(im); }
+      else if (d.text) it.append(d.text);
+      else { const s = document.createElement('small'); s.textContent = d.label || d.e2e || 'Nhãn dán'; it.appendChild(s); }
+      const x = document.createElement('span'); x.className = 'x'; x.textContent = '×'; x.title = 'Xoá';
+      x.onclick = e => { e.stopPropagation(); SP.stickers = SP.stickers.filter(y => y.id !== d.id); if (SP.sel === d.id) SP.sel = SP.stickers.length ? SP.stickers[SP.stickers.length - 1].id : ''; saveSP(); renderSpam(); };
+      it.appendChild(x);
+      it.onclick = () => { SP.sel = d.id; saveSP(); renderSpam(); };
+      g.appendChild(it);
+    }
+    const add = document.createElement('button'); add.className = 'it add'; add.innerHTML = '<span>＋</span><small>Thêm</small>'; add.onclick = learnSticker; g.appendChild(add);
+    // emoji / chữ
+    const em = $('spEmo'); em.textContent = '';
+    for (const e of SP_EMO) { const b = document.createElement('button'); b.textContent = e; b.className = !SP.rand && SP.text === e ? 'on' : ''; b.onclick = () => { SP.text = e; SP.rand = false; $('spText').value = ''; saveSP(); renderSpam(); }; em.appendChild(b); }
+    const rb = document.createElement('button'); rb.className = 'rnd' + (SP.rand ? ' on' : ''); rb.textContent = '🎲 Ngẫu nhiên'; rb.onclick = () => { SP.rand = !SP.rand; saveSP(); renderSpam(); }; em.appendChild(rb);
+    if (!SP_EMO.includes(SP.text) && document.activeElement !== $('spText')) $('spText').value = SP.text;
+    // số lần & tốc độ
+    $('spN').value = SP.n;
+    for (const b of $('spCq').querySelectorAll('button')) b.classList.toggle('on', Number(b.dataset.n) === SP.n);
+    const sp = $('spSpd'); sp.textContent = '';
+    for (const [ms, l, d] of SP_SPEEDS) { const b = document.createElement('button'); b.className = SP.spd === ms ? 'on' : ''; b.innerHTML = `<b>${l}</b><small>${d}</small>`; b.onclick = () => { SP.spd = ms; saveSP(); renderSpam(); }; sp.appendChild(b); }
+    $('spJit').checked = !!SP.jit;
+    const what = SP.kind === 'sticker' ? 'nhãn dán' : SP.rand ? 'emoji ngẫu nhiên' : `“${short(SP.text, 12)}”`;
+    $('spGoT').textContent = `Spam ${fmt(SP.n)} ${what}`;
+    $('spGo').disabled = !(sc && findInput()) || (SP.kind === 'sticker' && !SP.stickers.some(x => x.id === SP.sel)) || (SP.kind === 'text' && !SP.rand && !SP.text.trim());
+  }
+  for (const b of $('spKind').querySelectorAll('button')) b.onclick = () => { SP.kind = b.dataset.k; saveSP(); renderSpam(); };
+  $('spText').oninput = () => { const v = $('spText').value; if (v.trim()) { SP.text = v.slice(0, 200); SP.rand = false; } saveSP(); for (const b of $('spEmo').querySelectorAll('button')) b.classList.remove('on'); $('spGoT').textContent = `Spam ${fmt(SP.n)} “${short(SP.text, 12)}”`; };
+  const setN = v => { SP.n = clamp(Math.round(Number(v) || 1), 1, SP_MAX); saveSP(); renderSpam(); };
+  $('spN').onchange = () => setN($('spN').value);
+  $('spMinus').onclick = () => setN(SP.n - 1);
+  $('spPlus').onclick = () => setN(SP.n + 1);
+  for (const b of $('spCq').querySelectorAll('button')) b.onclick = () => setN(b.dataset.n);
+  $('spJit').onchange = () => { SP.jit = $('spJit').checked; saveSP(); };
+  $('spGo').onclick = () => runSpam();
+
+  async function runSpam() {
+    if (S.running) return;
+    const sc = findScroller(), title = sc ? findTitle(sc) : '';
+    if (!sc || !findInput()) { toast('Hãy mở một cuộc trò chuyện trước'); return; }
+    const st = SP.stickers.find(x => x.id === SP.sel);
+    if (SP.kind === 'sticker' && !st) { toast('Chọn hoặc thêm một nhãn dán trước'); return; }
+    const n = clamp(SP.n, 1, SP_MAX), gap = Math.max(SP_MIN_GAP, SP.spd), unit = SP.kind === 'sticker' ? 'nhãn dán' : 'tin';
+    S.running = true; S.stop = false;
+    closeSheet(); islandOn(true);
+    $('fStop').textContent = 'Dừng';
+    liveStart(title || 'Cuộc trò chuyện', chatAvatar(sc), 0, 1);
+    $('fName').textContent = `🚀 Spam → ${title || 'cuộc trò chuyện'}`;
+    $('fUnit').textContent = unit;
+    LV.spam = { sent: 0, n, fail: 0 };
+    LV.phase = 'Chuẩn bị gửi…';
+    LV.timer = setInterval(livePaint, 300);
+    keepAwake(true);
+    let fails = 0, err = '';
+    try {
+      for (let i = 0; i < n && !S.stop; i++) {
+        const s2 = findScroller();
+        if (!s2 || (title && !sameName(findTitle(s2), title))) throw new Error('Cuộc trò chuyện đã đổi — dừng lại để không gửi nhầm người.');
+        LV.phase = `Đang gửi ${i + 1}/${n} · ${(gap / 1000).toLocaleString('vi-VN')} giây/lần`;
+        const ok = SP.kind === 'sticker' ? await sendSticker(st) : await sendText(SP.rand ? SP_EMO[Math.floor(Math.random() * SP_EMO.length)] : SP.text);
+        if (ok) { LV.spam.sent++; fails = 0; LV.last = { total: LV.spam.sent, me: LV.spam.sent, them: 0, media: 0 }; }
+        else {
+          LV.spam.fail++;
+          if (++fails >= 3) throw new Error(SP.kind === 'sticker' ? 'Không tìm thấy nhãn dán. Hãy mở bảng nhãn dán của TikTok (hoặc thêm lại nhãn dán) rồi thử lại.' : 'Không gửi được tin. Hãy chạm vào ô nhập tin nhắn một lần rồi thử lại.');
+        }
+        if (i < n - 1) await new Promise(r => setTimeout(r, (SP.jit ? gap * (0.75 + Math.random() * 0.5) : gap) * SPEED));
+      }
+    } catch (e) { err = String((e && e.message) || e); }
+    clearInterval(LV.timer); livePaint();
+    const sent = LV.spam.sent;
+    LV.spam = null; keepAwake(false); S.running = false; islandOn(false);
+    toast(err ? '⚠ ' + err : `${S.stop ? 'Đã dừng. ' : ''}Đã gửi ${fmt(sent)} ${unit} ✓`, err ? 6000 : 3000);
+  }
 
   /* ---------- cài đặt ---------- */
   function renderSet() {
